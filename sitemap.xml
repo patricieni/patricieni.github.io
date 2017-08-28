@@ -5,7 +5,7 @@
     
     <url>
     
-      <loc>https://example.com/tags/academic/</loc>
+      <loc>https://patricieni.github.io/tags/academic/</loc>
       <lastmod>2017-01-01T00:00:00+00:00</lastmod>
     </url>
     
@@ -14,7 +14,7 @@
     
     <url>
     
-      <loc>https://example.com/talk/example-talk/</loc>
+      <loc>https://patricieni.github.io/talk/example-talk/</loc>
       <lastmod>2017-01-01T00:00:00+00:00</lastmod>
     </url>
     
@@ -23,7 +23,7 @@
     
     <url>
     
-      <loc>https://example.com/post/</loc>
+      <loc>https://patricieni.github.io/post/</loc>
       <lastmod>2017-01-01T00:00:00+00:00</lastmod>
     </url>
     
@@ -32,7 +32,7 @@
     
     <url>
     
-      <loc>https://example.com/publication/</loc>
+      <loc>https://patricieni.github.io/publication/</loc>
       <lastmod>2017-01-01T00:00:00+00:00</lastmod>
     </url>
     
@@ -41,7 +41,7 @@
     
     <url>
     
-      <loc>https://example.com/talk/</loc>
+      <loc>https://patricieni.github.io/talk/</loc>
       <lastmod>2017-01-01T00:00:00+00:00</lastmod>
     </url>
     
@@ -50,7 +50,7 @@
     
     <url>
     
-      <loc>https://example.com/project/generative-models/</loc>
+      <loc>https://patricieni.github.io/project/generative-models/</loc>
       <lastmod>2016-04-27T00:00:00+00:00</lastmod>
     </url>
     
@@ -59,7 +59,7 @@
     
     <url>
     
-      <loc>https://example.com/project/external-project/</loc>
+      <loc>https://patricieni.github.io/project/external-project/</loc>
       <lastmod>2016-04-27T00:00:00+00:00</lastmod>
     </url>
     
@@ -68,7 +68,7 @@
     
     <url>
     
-      <loc>https://example.com/post/getting-started/</loc>
+      <loc>https://patricieni.github.io/post/getting-started/</loc>
       <lastmod>2016-04-20T12:00:00+00:00</lastmod>
     </url>
     
@@ -77,7 +77,7 @@
     
     <url>
     
-      <loc>https://example.com/post/widgets/</loc>
+      <loc>https://patricieni.github.io/post/widgets/</loc>
       <lastmod>2016-04-20T11:00:00+00:00</lastmod>
     </url>
     
@@ -86,7 +86,7 @@
     
     <url>
     
-      <loc>https://example.com/post/managing-content/</loc>
+      <loc>https://patricieni.github.io/post/managing-content/</loc>
       <lastmod>2016-04-20T11:00:00+00:00</lastmod>
     </url>
     
@@ -95,7 +95,7 @@
     
     <url>
     
-      <loc>https://example.com/post/writing-markdown-latex/</loc>
+      <loc>https://patricieni.github.io/post/writing-markdown-latex/</loc>
       <lastmod>2016-04-20T10:00:00+00:00</lastmod>
     </url>
     
@@ -104,7 +104,7 @@
     
     <url>
     
-      <loc>https://example.com/publication/person-re-identification/</loc>
+      <loc>https://patricieni.github.io/publication/person-re-identification/</loc>
       <lastmod>2015-09-01T00:00:00+00:00</lastmod>
     </url>
     
@@ -113,7 +113,7 @@
     
     <url>
     
-      <loc>https://example.com/post/migrate-from-jekyll/</loc>
+      <loc>https://patricieni.github.io/post/migrate-from-jekyll/</loc>
       <lastmod>2014-03-10T00:00:00+00:00</lastmod>
     </url>
     
@@ -122,7 +122,7 @@
     
     <url>
     
-      <loc>https://example.com/publication_types/2/</loc>
+      <loc>https://patricieni.github.io/publication_types/2/</loc>
       <lastmod>2015-09-01T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -132,7 +132,7 @@
     
     <url>
     
-      <loc>https://example.com/</loc>
+      <loc>https://patricieni.github.io/</loc>
       <lastmod>2016-04-20T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -142,7 +142,7 @@
     
     <url>
     
-      <loc>https://example.com/categories/</loc>
+      <loc>https://patricieni.github.io/categories/</loc>
       <priority>0</priority>
     </url>
     
@@ -151,7 +151,7 @@
     
     <url>
     
-      <loc>https://example.com/tags/generative-models/</loc>
+      <loc>https://patricieni.github.io/tags/generative-models/</loc>
       <lastmod>2016-04-27T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -161,7 +161,7 @@
     
     <url>
     
-      <loc>https://example.com/tags/hugo/</loc>
+      <loc>https://patricieni.github.io/tags/hugo/</loc>
       <lastmod>2016-04-20T12:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -171,7 +171,7 @@
     
     <url>
     
-      <loc>https://example.com/tags/jekyll/</loc>
+      <loc>https://patricieni.github.io/tags/jekyll/</loc>
       <lastmod>2014-03-10T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -181,7 +181,7 @@
     
     <url>
     
-      <loc>https://example.com/tags/kaggle_cancer/</loc>
+      <loc>https://patricieni.github.io/tags/kaggle_cancer/</loc>
       <lastmod>2016-04-27T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -191,7 +191,7 @@
     
     <url>
     
-      <loc>https://example.com/project/</loc>
+      <loc>https://patricieni.github.io/project/</loc>
       <lastmod>2016-04-27T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -201,7 +201,7 @@
     
     <url>
     
-      <loc>https://example.com/publication_types/</loc>
+      <loc>https://patricieni.github.io/publication_types/</loc>
       <lastmod>2015-09-01T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -211,7 +211,7 @@
     
     <url>
     
-      <loc>https://example.com/tags/rbm/</loc>
+      <loc>https://patricieni.github.io/tags/rbm/</loc>
       <lastmod>2016-04-27T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -221,7 +221,7 @@
     
     <url>
     
-      <loc>https://example.com/tags/</loc>
+      <loc>https://patricieni.github.io/tags/</loc>
       <lastmod>2017-01-01T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
