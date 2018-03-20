@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Healthcare Ml on Patric Fulop</title>
+    <link>https://patricieni.github.io/tags/healthcare-ml/</link>
+    <description>Recent content in Healthcare Ml on Patric Fulop</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Patric M Fulop</copyright>
+    <lastBuildDate>Tue, 20 Mar 2018 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/healthcare-ml/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Gapminder Visualization for Scottish Health Data</title>
+      <link>https://patricieni.github.io/project/gapminder-scotland/</link>
+      <pubDate>Tue, 20 Mar 2018 00:00:00 +0000</pubDate>
+      
+      <guid>https://patricieni.github.io/project/gapminder-scotland/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

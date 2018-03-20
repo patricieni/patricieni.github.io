@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Healthcare_ml on Patric Fulop</title>
+    <link>https://patricieni.github.io/tags/healthcare_ml/</link>
+    <description>Recent content in Healthcare_ml on Patric Fulop</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Patric M Fulop</copyright>
+    <lastBuildDate>Wed, 27 Apr 2016 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/healthcare_ml/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Healthcare Classification and Survival Analysis</title>
+      <link>https://patricieni.github.io/project/tumor-prediction/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://patricieni.github.io/project/tumor-prediction/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

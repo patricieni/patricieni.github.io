@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Generative Models on Patric Fulop</title>
+    <link>https://patricieni.github.io/tags/generative-models/</link>
+    <description>Recent content in Generative Models on Patric Fulop</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Patric M Fulop</copyright>
+    <lastBuildDate>Wed, 27 Apr 2016 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/generative-models/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Generative Models</title>
+      <link>https://patricieni.github.io/project/generative-models/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://patricieni.github.io/project/generative-models/</guid>
+      <description>&lt;p&gt;Some words here about RBM? Maybe do a nice review of the Wasserstein RBM.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
