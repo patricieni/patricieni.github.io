@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://patricieni.github.io/project/gapminder-scotland/</loc>
+      <lastmod>2018-03-20T00:00:00+00:00</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://patricieni.github.io/publication/paper1/</loc>
       <lastmod>2017-09-01T00:00:00+00:00</lastmod>
     </url>
@@ -68,7 +77,7 @@
     
     <url>
     
-      <loc>https://patricieni.github.io/project/external-project/</loc>
+      <loc>https://patricieni.github.io/project/tumor-prediction/</loc>
       <lastmod>2016-04-27T00:00:00+00:00</lastmod>
     </url>
     
@@ -105,7 +114,37 @@
     
     <url>
     
+      <loc>https://patricieni.github.io/tags/gapminder-scotland/</loc>
+      <lastmod>2018-03-20T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://patricieni.github.io/tags/generative-models/</loc>
+      <lastmod>2016-04-27T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://patricieni.github.io/tags/healthcare-ml/</loc>
+      <lastmod>2018-03-20T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://patricieni.github.io/tags/healthcare_ml/</loc>
       <lastmod>2016-04-27T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
@@ -125,16 +164,6 @@
     
     <url>
     
-      <loc>https://patricieni.github.io/tags/kaggle_cancer/</loc>
-      <lastmod>2016-04-27T00:00:00+00:00</lastmod>
-      <priority>0</priority>
-    </url>
-    
-  
-    
-    
-    <url>
-    
       <loc>https://patricieni.github.io/</loc>
       <lastmod>2016-04-20T00:00:00+00:00</lastmod>
       <priority>0</priority>
@@ -146,7 +175,7 @@
     <url>
     
       <loc>https://patricieni.github.io/project/</loc>
-      <lastmod>2016-04-27T00:00:00+00:00</lastmod>
+      <lastmod>2018-03-20T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -177,6 +206,16 @@
     
       <loc>https://patricieni.github.io/tags/</loc>
       <lastmod>2017-01-01T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://patricieni.github.io/tags/tumor-prediction/</loc>
+      <lastmod>2016-04-27T00:00:00+00:00</lastmod>
       <priority>0</priority>
     </url>
     
