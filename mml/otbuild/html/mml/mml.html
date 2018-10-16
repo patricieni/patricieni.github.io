@@ -1,0 +1,1092 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mml package &mdash; Metric Learning version 58876c6</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Metric Learning version 58876c6" href="../index.html"/>
+        <link rel="next" title="TODO List" href="../doc/TODO.html"/>
+        <link rel="prev" title="Multiscale Metric Learning" href="../Multiscale Metric Learning.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index_ot.html" class="icon icon-home"> Metric Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning-GPU.html">Multiscale Metric Learning - GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning.html">Multiscale Metric Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MML Library</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">mml package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mml.gml">mml.gml module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mml-datasets-module">mml.datasets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mml-plot-module">mml.plot module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mml.sinkhorn">mml.sinkhorn module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mml-testing-module">mml.testing module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mml.transform">mml.transform module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mml.wasserstein">mml.wasserstein module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-mml.helper">mml.helper module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">TODO List</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../doc/TODO.html">TODO List</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index_ot.html">Metric Learning</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index_ot.html">Docs</a> &raquo;</li>
+        
+      <li>mml package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/mml/mml.rst" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="mml-package">
+<h1>mml package<a class="headerlink" href="#mml-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-mml.gml">
+<span id="mml-gml-module"></span><h2>mml.gml module<a class="headerlink" href="#module-mml.gml" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="mml.gml.algorithm1_dissimilar">
+<code class="descclassname">mml.gml.</code><code class="descname">algorithm1_dissimilar</code><span class="sig-paren">(</span><em>M</em>, <em>w</em>, <em>G_all</em>, <em>T_all</em>, <em>k=3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#algorithm1_dissimilar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.algorithm1_dissimilar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Algorithm 1 from Cuturi GML for dissimilar neighbours</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>M</strong> (<em>matrix</em>) – Ground metric</li>
+<li><strong>w</strong> (<em>matrix</em>) – Similarity Matrix</li>
+<li><strong>G_all</strong> (<em>matrix</em>) – All Wasserstein distances</li>
+<li><strong>T_all</strong> (<em>tensor</em>) – All coupling matrices</li>
+<li><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Defaults to 3. Neighbours to consider</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The weighted sum for dissimilar components for the minimization criteria (z) and the gradients (gamma)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">z_plus, gamma_plus</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.algorithm1_similar">
+<code class="descclassname">mml.gml.</code><code class="descname">algorithm1_similar</code><span class="sig-paren">(</span><em>M</em>, <em>w</em>, <em>G_all</em>, <em>T_all</em>, <em>k=3</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#algorithm1_similar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.algorithm1_similar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Algorithm 1 from Cuturi GML for the similar neighbours</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>M</strong> (<em>matrix</em>) – Ground metric</li>
+<li><strong>w</strong> (<em>matrix</em>) – Similarity Matrix</li>
+<li><strong>G_all</strong> (<em>matrix</em>) – All Wasserstein distances</li>
+<li><strong>T_all</strong> (<em>tensor</em>) – All coupling matrices</li>
+<li><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – Defaults to 3. Neighbours to consider</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The weighted sum for similar components for the minimization criteria (z) and the gradients (gamma)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">z_plus, gamma_plus</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.compute_distances">
+<code class="descclassname">mml.gml.</code><code class="descname">compute_distances</code><span class="sig-paren">(</span><em>X</em>, <em>M</em>, <em>showProgress=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#compute_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.compute_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes all Wasserstein distances as well as optimal couplings.
+Very costly operation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X</strong> (<em>array</em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – Dataset</li>
+<li><strong>M</strong> (<em>array</em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – Ground Metric</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">All possible W2 distances and couplings for X and M</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(array,array)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.dissimilar_neighbours">
+<code class="descclassname">mml.gml.</code><code class="descname">dissimilar_neighbours</code><span class="sig-paren">(</span><em>neigh</em>, <em>w</em>, <em>G_all</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#dissimilar_neighbours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.dissimilar_neighbours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find dissimilar neighbours based on Wasserstein distances and a similarity matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>neigh</strong> (<em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a><em>]</em>) – Number of similar neighbours to look at</li>
+<li><strong>w</strong> (<em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a><em>]</em>) – Similarity matrix</li>
+<li><strong>G_all</strong> (<em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a><em>]</em>) – Wasserstein distances between each pair of histograms</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list(dict(i,w,g)) A list of all histograms with it’s associated information on k similar neighbours (dictionary of (w,G) pair)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.gradient_neighbours">
+<code class="descclassname">mml.gml.</code><code class="descname">gradient_neighbours</code><span class="sig-paren">(</span><em>w</em>, <em>T_all</em>, <em>S</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#gradient_neighbours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.gradient_neighbours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds all gradients for the subset of neighbours as a list of OT matrices</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>w</strong> (<em>matrix</em>) – Similarity matrix</li>
+<li><strong>T_all</strong> (<em>tensor</em>) – Tensor of al optimal matrices given by all pairs of histograms</li>
+<li><strong>S</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List containing all information similar OR dissimilar neighbours</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list of all OT matrices (~gradients of G) for histograms
+containing k similar/dissimilar neighbours (dictionary of (w,X) pair)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.project_metric">
+<code class="descclassname">mml.gml.</code><code class="descname">project_metric</code><span class="sig-paren">(</span><em>m_initial</em>, <em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#project_metric"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.project_metric" title="Permalink to this definition">¶</a></dt>
+<dd><p>Projects matrices that are not semi-metric to the closest true semi-metric using the metricNearnes software
+TODO: Add in the C++ code the possibility to pass some sort of byte array to the metric code, currently reading and
+writing to a txt file “metricNearness_process/matrix”</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>m_initial</strong> (<em>array</em>) – Approximate metric to project</li>
+<li><strong>filepath</strong> (<em>string</em>) – Filename to read and write the matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Projection of m_initial using the metricNearness software</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.projected_subgradient">
+<code class="descclassname">mml.gml.</code><code class="descname">projected_subgradient</code><span class="sig-paren">(</span><em>X_train_normalized</em>, <em>M</em>, <em>w</em>, <em>f</em>, <em>logger</em>, <em>q_max=40</em>, <em>p_max=20</em>, <em>early_stopping=False</em>, <em>progress_bar=True</em>, <em>experiment=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#projected_subgradient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.projected_subgradient" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the projected subgradient descent that is Algorithm 2 of Cuturi GML paper
+TODO - Enter the best M_initial using Algorithm 3</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X_train_normalized</strong> (<em>array</em>) – Normalized dataset</li>
+<li><strong>M</strong> (<em>array</em>) – Initial ground metric for our algorithm</li>
+<li><strong>w</strong> (<em>array</em>) – Similarity matrix</li>
+<li><strong>f</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of matrix file for projection code</li>
+<li><strong>logger</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Logger Handler</li>
+<li><strong>q_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Inner Loop max interations</li>
+<li><strong>p_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Outer Loop max iterations</li>
+<li><strong>early_stopping</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Boolean Value for inner loop</li>
+<li><strong>progress_bar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Boolean value for notebook run</li>
+<li><strong>experiment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – String value for experiment name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The learned ground metric and a list that tracks the objective criteria</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.setup_logger">
+<code class="descclassname">mml.gml.</code><code class="descname">setup_logger</code><span class="sig-paren">(</span><em>name</em>, <em>log_file</em>, <em>level=20</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#setup_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.setup_logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function setup as many loggers as you want</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.similar_neighbours">
+<code class="descclassname">mml.gml.</code><code class="descname">similar_neighbours</code><span class="sig-paren">(</span><em>neigh</em>, <em>w</em>, <em>G_all</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#similar_neighbours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.similar_neighbours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find similar neighbours based on Wasserstein distances and a similarity matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>neigh</strong> (<em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a><em>]</em>) – Number of similar neighbours to look at</li>
+<li><strong>w</strong> (<em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a><em>]</em>) – Similarity matrix</li>
+<li><strong>G_all</strong> (<em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a><em>]</em>) – Wasserstein distances between each pair of histograms</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list(dict(i,w,g)) A list of all histograms with their associated information on k similar neighbours (dictionary of (w,G) pair)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.similarity_matrix">
+<code class="descclassname">mml.gml.</code><code class="descname">similarity_matrix</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em>, <em>k</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#similarity_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.similarity_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds a similarity matrix using X and Y labels as well as k neighbours. Similarity is given by same labels and the similarity value is proportional to size of data n and neighbours k.
+The opposite is true for dissimilarity, same value with a minus sign.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X</strong> (<em>array</em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – Dataset</li>
+<li><strong>Y</strong> (<em>array</em><em>(</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>)</em>) – Labels</li>
+<li><strong>k</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of neighbours used in GML</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A matrix w of shape X.shape[0],X.shape[0]</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a>,<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a>]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.sum_gradients">
+<code class="descclassname">mml.gml.</code><code class="descname">sum_gradients</code><span class="sig-paren">(</span><em>grad</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#sum_gradients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.sum_gradients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sums up neighbours of all gradients in the dataset.
+This amounts to grad(S^+_{ik}(M)) from Cuturi GML section 4.1</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>grad</strong> (<em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.7)"><em>type</em></a><em>]</em>) – List of neighbour gradients, similar/dissimilar</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of the weighted sum of wasserstein distance gradients(equivalent to OT matrix) to similar neighbours</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<p>for all histograms</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.gml.sum_neighbours">
+<code class="descclassname">mml.gml.</code><code class="descname">sum_neighbours</code><span class="sig-paren">(</span><em>S</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/gml.html#sum_neighbours"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.gml.sum_neighbours" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sums up similar neighbours of all elements in the dataset.
+This amounts to sum (S^+_{ik}(M)) from Cuturi GML</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>S</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – List of similar/dissimilar neighbours with pairs (w,G)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The weighted sum of distances to similar and disimilar neighbours</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="mml-datasets-module">
+<h2>mml.datasets module<a class="headerlink" href="#mml-datasets-module" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-mml.datasets"></span><dl class="function">
+<dt id="mml.datasets.data_pairs">
+<code class="descclassname">mml.datasets.</code><code class="descname">data_pairs</code><span class="sig-paren">(</span><em>all_digits</em>, <em>key1</em>, <em>key2</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/datasets.html#data_pairs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.datasets.data_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specify which binary classification you want and return a dataset accordingly.
+Input a dictionary of all digits instances for all classes, key corresponds to class label.
+We make the assumption that digits have the correct labels. This is a true statement correct? When thinking about MNIST</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>all_digits</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – dictionary of key: digit value: training data for key</li>
+<li><strong>key1</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – digit you want to classify</li>
+<li><strong>key2</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – digit you want to classify</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a list of the training data with its associated labels</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">[array,array]</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.datasets.dictionary">
+<code class="descclassname">mml.datasets.</code><code class="descname">dictionary</code><span class="sig-paren">(</span><em>X</em>, <em>Y</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/datasets.html#dictionary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.datasets.dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary where the key is the label or digit and the value
+is an array of all training points associated to that digit</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X</strong> (<em>array</em>) – Training points</li>
+<li><strong>Y</strong> (<em>array</em>) – Labels</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Each entry key will be associated to a label and the values will be all training points for that key.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.datasets.load_caltech">
+<code class="descclassname">mml.datasets.</code><code class="descname">load_caltech</code><span class="sig-paren">(</span><em>repr</em>, <em>path</em>, <em>download=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/datasets.html#load_caltech"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.datasets.load_caltech" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method to load Caltech256 - without downloading
+Bare in mind Y is no longer an array with numbers, it has objects and strings in it..
+Need some sort of dictionary again</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>repr</strong> (<em>string</em>) – What representation of the objects to load, i.e. Hellinger</li>
+<li><strong>path</strong> (<em>string</em>) – Path to where the files reside.</li>
+<li><strong>download</strong> (<em>boolean</em>) – Defaults to False</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">pairs in the correct representation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">X,Y (np.array)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.datasets.load_mnist">
+<code class="descclassname">mml.datasets.</code><code class="descname">load_mnist</code><span class="sig-paren">(</span><em>repr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/datasets.html#load_mnist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.datasets.load_mnist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper method to load MNIST - SIFT data in the desired representation
+Right now you can load normal data or Hellinger representation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>repr</strong> (<em>string</em>) – Name of representation you want for MNIST training points</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">X, Y pair in the correct representation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="mml-plot-module">
+<h2>mml.plot module<a class="headerlink" href="#mml-plot-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-mml.sinkhorn">
+<span id="mml-sinkhorn-module"></span><h2>mml.sinkhorn module<a class="headerlink" href="#module-mml.sinkhorn" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="mml-testing-module">
+<h2>mml.testing module<a class="headerlink" href="#mml-testing-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-mml.transform">
+<span id="mml-transform-module"></span><h2>mml.transform module<a class="headerlink" href="#module-mml.transform" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="mml.transform.normalize">
+<code class="descclassname">mml.transform.</code><code class="descname">normalize</code><span class="sig-paren">(</span><em>x_train</em>, <em>x_test</em>, <em>norm</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/transform.html#normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.transform.normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize data that’s already positive</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x_train</strong> (<em>array</em>) – Training data</li>
+<li><strong>x_test</strong> (<em>array</em>) – Test data</li>
+<li><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Either L1 or L2, or something else perhaps</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Normalized train and test data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(array, array)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.transform.positive_and_normalize">
+<code class="descclassname">mml.transform.</code><code class="descname">positive_and_normalize</code><span class="sig-paren">(</span><em>x_train</em>, <em>x_test</em>, <em>norm</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/transform.html#positive_and_normalize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.transform.positive_and_normalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize the data and if negative, make it positive before normalizing by adding the min value needed</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x_train</strong> (<em>array</em>) – Training data</li>
+<li><strong>x_test</strong> (<em>array</em>) – Test data</li>
+<li><strong>norm</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Either L1 or L2, or something else perhaps</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Positive and normalized train and test data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(array, array)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mml.wasserstein">
+<span id="mml-wasserstein-module"></span><h2>mml.wasserstein module<a class="headerlink" href="#module-mml.wasserstein" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="mml.wasserstein.all_couplings">
+<code class="descclassname">mml.wasserstein.</code><code class="descname">all_couplings</code><span class="sig-paren">(</span><em>X</em>, <em>M</em>, <em>showProgress=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/wasserstein.html#all_couplings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.wasserstein.all_couplings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Wasserstein couplings between every pair of points in X,
+using M as a the ground metric.</p>
+<p>TODO:
+The POT library also supports W_2 between histogram and array of histograms.
+Only calculate upper diagonal/lower diagonal then symmetrize</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X</strong> (<em>array</em>) – Normalized dataset</li>
+<li><strong>M</strong> (<em>matrix</em>) – Ground metric</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A tensor of shape n x n x m x m containing at each entry an OT matrix m x m</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matrix</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.wasserstein.all_distances">
+<code class="descclassname">mml.wasserstein.</code><code class="descname">all_distances</code><span class="sig-paren">(</span><em>X</em>, <em>M</em>, <em>showProgress=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/wasserstein.html#all_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.wasserstein.all_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Wasserstein distances between every pair of points in X, using M as a the ground metric.</p>
+<p>TODO:
+The POT library also supports W_2 between histogram and array of histograms.
+Only calculate upper diagonal/lower diagonal then symmetrize</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>X</strong> (<em>array</em>) – Normalized dataset</li>
+<li><strong>M</strong> (<em>matrix</em>) – Ground metric</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A matrix of shape n x n containing all W_2 distances</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matrix</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.wasserstein.coupling">
+<code class="descclassname">mml.wasserstein.</code><code class="descname">coupling</code><span class="sig-paren">(</span><em>r1</em>, <em>r2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/wasserstein.html#coupling"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.wasserstein.coupling" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Wasserstein coupling (OT matrix) between r1 and r2 using a ground metric specified as dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r1</strong> (<em>array</em>) – Histogram or normalized prob distribution</li>
+<li><strong>r2</strong> (<em>array</em>) – Histogram or normalized prob distribution</li>
+<li><strong>M</strong> (<em>matrix</em>) – Ground Metric</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The optimal Wasserstein-2 coupling between r1,r2, as well as M, the ground metric</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">[matrix,matrix]</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Raises:
+RuntimeError, TypeError, NameError</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.wasserstein.coupling_sinkhorn">
+<code class="descclassname">mml.wasserstein.</code><code class="descname">coupling_sinkhorn</code><span class="sig-paren">(</span><em>r1</em>, <em>r2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/wasserstein.html#coupling_sinkhorn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.wasserstein.coupling_sinkhorn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute regularized Wasserstein coupling (OT-reg coupling) between r1 and r2 using a ground metric
+and a regularizer, using the Sinkhorn-Knopp algorithm
+TODO: Add the Greenkhorn and more fail-proof algos like Sinkhorn epsilon scaling</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r1</strong> (<em>array</em>) – Histogram or normalized prob distribution</li>
+<li><strong>r2</strong> (<em>array</em>) – Histogram or normalized prob distribution</li>
+<li><strong>M</strong> (<em>matrix</em>) – Ground Metric</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The optimal regularized Wasserstein-2 distance between r1,r2, as well as the ground metric M</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">RuntimeError, TypeError, NameError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.wasserstein.distance">
+<code class="descclassname">mml.wasserstein.</code><code class="descname">distance</code><span class="sig-paren">(</span><em>r1</em>, <em>r2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/wasserstein.html#distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.wasserstein.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute Wasserstein distance (OT-reg distance) between r1 and r2 using a ground metric specified as dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r1</strong> (<em>array</em>) – Histogram or normalized prob distribution</li>
+<li><strong>r2</strong> (<em>array</em>) – Histogram or normalized prob distribution</li>
+<li><strong>M</strong> (<em>matrix</em>) – Ground Metric</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The optimal Wasserstein-2 distance between r1,r2, given M</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">RuntimeError, TypeError, NameError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.wasserstein.distance_sinkhorn">
+<code class="descclassname">mml.wasserstein.</code><code class="descname">distance_sinkhorn</code><span class="sig-paren">(</span><em>r1</em>, <em>r2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/wasserstein.html#distance_sinkhorn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.wasserstein.distance_sinkhorn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute regularized Wasserstein distance (OT distance) between r1 and r2 using a ground metric
+and a regularizer, using the Sinkhorn-Knopp algorithm
+TODO: Add the Greenkhorn and more fail-proof algos like Sinkhorn epsilon scaling</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>r1</strong> (<em>array</em>) – Histogram or normalized prob distribution</li>
+<li><strong>r2</strong> (<em>array</em>) – Histogram or normalized prob distribution</li>
+<li><strong>M</strong> (<em>matrix</em>) – Ground Metric</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The optimal regularized Wasserstein-2 distance between r1,r2, given M</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">RuntimeError, TypeError, NameError</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-mml.helper">
+<span id="mml-helper-module"></span><h2>mml.helper module<a class="headerlink" href="#module-mml.helper" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="mml.helper.load_json">
+<code class="descclassname">mml.helper.</code><code class="descname">load_json</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#load_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.load_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.load_ndarray">
+<code class="descclassname">mml.helper.</code><code class="descname">load_ndarray</code><span class="sig-paren">(</span><em>file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#load_ndarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.load_ndarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load an array from correct results path</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>file</strong> (<em>[</em><em>String</em><em>]</em>) – file name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.matrix_from_vector">
+<code class="descclassname">mml.helper.</code><code class="descname">matrix_from_vector</code><span class="sig-paren">(</span><em>M</em>, <em>size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#matrix_from_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.matrix_from_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take the lower diagonal metric matrix in vector notation and transform it into a matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>M</strong> (<em>np.array</em>) – The diagonal matrix in vector notation</li>
+<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The shape of the resulting matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The lower diagonal of a metric/semi-metric matrix</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matrix</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.save_json">
+<code class="descclassname">mml.helper.</code><code class="descname">save_json</code><span class="sig-paren">(</span><em>path</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#save_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.save_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.save_ndarray">
+<code class="descclassname">mml.helper.</code><code class="descname">save_ndarray</code><span class="sig-paren">(</span><em>path</em>, <em>arr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#save_ndarray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.save_ndarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save an array, will most likely be the ground metric</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>path</strong> (<em>[</em><em>String</em><em>]</em>) – file path</li>
+<li><strong>arr</strong> (<em>[</em><em>array</em><em>]</em>) – array name</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.symmetrize">
+<code class="descclassname">mml.helper.</code><code class="descname">symmetrize</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#symmetrize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.symmetrize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take a upper/lower matrix and symmetrize the lower/upper part</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a</strong> (<em>matrix</em>) – Lower or Upper matrix to symmetrize</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Symmetrized metric</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.symmetrize_from_vector">
+<code class="descclassname">mml.helper.</code><code class="descname">symmetrize_from_vector</code><span class="sig-paren">(</span><em>M</em>, <em>size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#symmetrize_from_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.symmetrize_from_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take the lower diagonal metric matrix in vector notation and transform it into a symmetric metric matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>M</strong> (<em>np.array</em>) – The diagonal matrix in vector notation</li>
+<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The shape of the resulting matrix</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A metric/semi-metric matrix resulting from the lower diagonal vector</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">matrix</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.tril">
+<code class="descclassname">mml.helper.</code><code class="descname">tril</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#tril"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.tril" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return (strictly) lower triangular part of a matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a</strong> (<em>matrix</em>) – A matrix, in the GML case, the ground metric</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The lower part of the matrix, with the upper part as zero</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.tril_vector">
+<code class="descclassname">mml.helper.</code><code class="descname">tril_vector</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#tril_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.tril_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return (strictly) lower triangular part of a matrix as a vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a</strong> (<em>matrix</em>) – A matrix, in the GML case, the ground metric</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The lower part of the matrix as a vector</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">np.array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.triu">
+<code class="descclassname">mml.helper.</code><code class="descname">triu</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#triu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.triu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return (strictly) upper triangular part of a matrix</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a</strong> (<em>matrix</em>) – A matrix, in the GML case, the ground metric</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The lower part of the matrix, with the upper part as zero</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="mml.helper.triu_vector">
+<code class="descclassname">mml.helper.</code><code class="descname">triu_vector</code><span class="sig-paren">(</span><em>a</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mml/helper.html#triu_vector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mml.helper.triu_vector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return (strictly) upper triangular part of a matrix as a vector</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a</strong> (<em>matrix</em>) – A matrix, in the GML case, the ground metric</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The lower part of the matrix as a vector</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">matrix</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../doc/TODO.html" class="btn btn-neutral float-right" title="TODO List" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../Multiscale Metric Learning.html" class="btn btn-neutral" title="Multiscale Metric Learning" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Patric Fulop.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'58876c6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

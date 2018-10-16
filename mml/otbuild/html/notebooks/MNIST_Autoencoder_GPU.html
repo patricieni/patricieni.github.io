@@ -1,0 +1,1517 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>VAE Encoder/Decoder architecture &mdash; Metric Learning version 58876c6</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Metric Learning version 58876c6" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index_ot.html" class="icon icon-home"> Metric Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning-GPU.html">Multiscale Metric Learning - GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning.html">Multiscale Metric Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MML Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mml/mml.html">mml package</a></li>
+</ul>
+<p class="caption"><span class="caption-text">TODO List</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../doc/TODO.html">TODO List</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index_ot.html">Metric Learning</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index_ot.html">Docs</a> &raquo;</li>
+        
+      <li>VAE Encoder/Decoder architecture</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/notebooks/MNIST_Autoencoder_GPU.ipynb" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">io</span><span class="p">,</span> <span class="n">transform</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s1">&#39;whitegrid&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">imageio</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="o">%</span> <span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="c1"># Dataset &amp; Utils</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="k">import</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="k">import</span> <span class="n">save_image</span>
+
+<span class="c1"># Optimizer, Functions, Distributions</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="k">import</span> <span class="n">Variable</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.distributions</span> <span class="k">as</span> <span class="nn">ds</span>
+
+
+<span class="c1"># My models, optimizer classes - VAE, Adam</span>
+<span class="kn">import</span> <span class="nn">nldr.models</span>
+<span class="kn">from</span> <span class="nn">nldr.models</span> <span class="k">import</span> <span class="n">vae</span><span class="p">,</span> <span class="n">Encoder</span><span class="p">,</span> <span class="n">Decoder</span><span class="p">,</span> <span class="n">VAE</span>
+<span class="kn">from</span> <span class="nn">nldr.models</span> <span class="k">import</span> <span class="n">optimizers</span><span class="p">,</span> <span class="n">Optimizer</span>
+<span class="kn">import</span> <span class="nn">nldr.utils</span>
+<span class="kn">from</span> <span class="nn">nldr.utils.datasets</span> <span class="k">import</span> <span class="n">MNIST_Loader</span><span class="p">,</span> <span class="n">Visualize</span><span class="p">,</span> <span class="n">Caltech256</span><span class="p">,</span> <span class="n">Caltech256_Loader</span>
+
+<span class="c1"># Unrelated but useful</span>
+<span class="n">get_types</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:[(</span><span class="n">a</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;_&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">results_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;/results/vae_mnist/&quot;</span>
+<span class="n">data_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;/data/latent/&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">nldr</span><span class="o">.</span><span class="n">utils</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">nldr</span><span class="o">.</span><span class="n">models</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">gpu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
+<span class="c1">#gpu = False</span>
+<span class="n">gpu</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[3]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>True
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#train_loader, test_loader = MNIST_Loader(batch_size=64).load()</span>
+<span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span> <span class="o">=</span> <span class="n">MNIST_Loader</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">classes</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># get some random training images</span>
+<span class="c1">#dataiter = iter(train_loader)</span>
+<span class="c1">#images, labels = dataiter.next()</span>
+<span class="c1">#rand_image = MNIST_Loader().random_image(images)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#Visualize.imshow_batch(images)</span>
+<span class="c1">#Visualize.display_labels(classes,labels)</span>
+
+<span class="c1"># Visualize a random digit from a batch</span>
+<span class="c1">#Visualize.imshow_random(images)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="VAE-Encoder/Decoder-architecture">
+<h1>VAE Encoder/Decoder architecture<a class="headerlink" href="#VAE-Encoder/Decoder-architecture" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">D_in</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">D_out</span> <span class="o">=</span> <span class="mi">784</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">36</span>
+<span class="n">encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">D_in</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">D_out</span><span class="p">)</span>
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">D_out</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">D_in</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">gpu</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using GPU for encoder decoder&quot;</span><span class="p">)</span>
+    <span class="n">encoder</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+    <span class="n">decoder</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using GPU for encoder decoder
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#model_vae = VAE().to(device) - if cuda is available, but not the case, yet</span>
+<span class="n">model_vae_</span> <span class="o">=</span> <span class="n">VAE</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span><span class="n">decoder</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">gpu</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using GPU for VAE&quot;</span><span class="p">)</span>
+    <span class="n">model_vae_</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">Optimizer</span><span class="p">(</span><span class="n">model_vae_</span><span class="p">,</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model_vae_</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">),</span><span class="n">early_stopping</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">gpu</span><span class="o">=</span><span class="n">gpu</span><span class="p">,</span><span class="n">results_path</span><span class="o">=</span><span class="n">results_path</span><span class="p">)</span>
+<span class="c1">#optim.RMSprop(model_vae.parameters(), lr = 1e-3, momentum=0.9)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Using GPU for VAE
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Generate 64 different digits. The sample is just the mean.</span>
+<span class="c1"># Turn on early stopping</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">80</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">train_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="n">train_loader</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">test_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="n">test_loader</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">D_out</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">gpu</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sample on GPU&quot;</span><span class="p">)</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">model_vae_</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="n">save_image</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span>
+                   <span class="n">results_path</span><span class="o">+</span><span class="s1">&#39;sample_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">and</span> <span class="n">epoch</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">:</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">optimizer</span><span class="o">.</span><span class="n">average_loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">average_loss</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">thres</span> <span class="o">=</span> <span class="n">diff</span><span class="o">/</span><span class="n">optimizer</span><span class="o">.</span><span class="n">average_loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">thres</span><span class="o">&lt;=</span> <span class="mf">0.03</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Performing early stopping .. &quot;</span><span class="p">)</span>
+            <span class="k">break</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="stderr output_area docutils container">
+<div class="highlight"><pre>
+/afs/inf.ed.ac.uk/user/s10/s1043702/miniconda3/envs/ot/lib/python3.6/site-packages/torch/nn/functional.py:1006: UserWarning: nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.
+  warnings.warn(&#34;nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.&#34;)
+/afs/inf.ed.ac.uk/user/s10/s1043702/miniconda3/envs/ot/lib/python3.6/site-packages/torch/nn/functional.py:52: UserWarning: size_average and reduce args will be deprecated, please use reduction=&#39;sum&#39; instead.
+  warnings.warn(warning.format(ret))
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Train Epoch: 1 [0/60000 (0%)]   Loss: 138.554717
+Train Epoch: 1 [5000/60000 (8%)]        Loss: 139.138965
+Train Epoch: 1 [10000/60000 (17%)]      Loss: 134.963281
+Train Epoch: 1 [15000/60000 (25%)]      Loss: 140.886777
+Train Epoch: 1 [20000/60000 (33%)]      Loss: 144.078115
+Train Epoch: 1 [25000/60000 (42%)]      Loss: 140.239512
+Train Epoch: 1 [30000/60000 (50%)]      Loss: 137.443301
+Train Epoch: 1 [35000/60000 (58%)]      Loss: 135.395635
+Train Epoch: 1 [40000/60000 (67%)]      Loss: 137.245215
+Train Epoch: 1 [45000/60000 (75%)]      Loss: 142.074922
+Train Epoch: 1 [50000/60000 (83%)]      Loss: 145.085996
+Train Epoch: 1 [55000/60000 (92%)]      Loss: 139.156338
+====&gt; Epoch: 1 Average loss: 138.3253
+====&gt; Test set loss: 122.8785
+Sample on GPU
+Train Epoch: 2 [0/60000 (0%)]   Loss: 140.642988
+Train Epoch: 2 [5000/60000 (8%)]        Loss: 134.727871
+Train Epoch: 2 [10000/60000 (17%)]      Loss: 134.680488
+Train Epoch: 2 [15000/60000 (25%)]      Loss: 135.721377
+Train Epoch: 2 [20000/60000 (33%)]      Loss: 134.054873
+Train Epoch: 2 [25000/60000 (42%)]      Loss: 130.942461
+Train Epoch: 2 [30000/60000 (50%)]      Loss: 128.140488
+Train Epoch: 2 [35000/60000 (58%)]      Loss: 132.356279
+Train Epoch: 2 [40000/60000 (67%)]      Loss: 130.578164
+Train Epoch: 2 [45000/60000 (75%)]      Loss: 135.656094
+Train Epoch: 2 [50000/60000 (83%)]      Loss: 129.538437
+Train Epoch: 2 [55000/60000 (92%)]      Loss: 132.346719
+====&gt; Epoch: 2 Average loss: 133.0013
+====&gt; Test set loss: 118.3405
+Sample on GPU
+Train Epoch: 3 [0/60000 (0%)]   Loss: 131.094531
+Train Epoch: 3 [5000/60000 (8%)]        Loss: 132.003506
+Train Epoch: 3 [10000/60000 (17%)]      Loss: 138.002910
+Train Epoch: 3 [15000/60000 (25%)]      Loss: 129.560215
+Train Epoch: 3 [20000/60000 (33%)]      Loss: 124.810537
+Train Epoch: 3 [25000/60000 (42%)]      Loss: 131.837451
+Train Epoch: 3 [30000/60000 (50%)]      Loss: 126.081445
+Train Epoch: 3 [35000/60000 (58%)]      Loss: 127.259971
+Train Epoch: 3 [40000/60000 (67%)]      Loss: 128.210195
+Train Epoch: 3 [45000/60000 (75%)]      Loss: 125.313555
+Train Epoch: 3 [50000/60000 (83%)]      Loss: 123.197295
+Train Epoch: 3 [55000/60000 (92%)]      Loss: 123.520039
+====&gt; Epoch: 3 Average loss: 128.8791
+====&gt; Test set loss: 114.3315
+Sample on GPU
+Train Epoch: 4 [0/60000 (0%)]   Loss: 125.264229
+Train Epoch: 4 [5000/60000 (8%)]        Loss: 127.077178
+Train Epoch: 4 [10000/60000 (17%)]      Loss: 126.173438
+Train Epoch: 4 [15000/60000 (25%)]      Loss: 124.417705
+Train Epoch: 4 [20000/60000 (33%)]      Loss: 132.471182
+Train Epoch: 4 [25000/60000 (42%)]      Loss: 123.706543
+Train Epoch: 4 [30000/60000 (50%)]      Loss: 129.000977
+Train Epoch: 4 [35000/60000 (58%)]      Loss: 124.666299
+Train Epoch: 4 [40000/60000 (67%)]      Loss: 126.091621
+Train Epoch: 4 [45000/60000 (75%)]      Loss: 127.591445
+Train Epoch: 4 [50000/60000 (83%)]      Loss: 124.969219
+Train Epoch: 4 [55000/60000 (92%)]      Loss: 122.650937
+====&gt; Epoch: 4 Average loss: 125.6232
+====&gt; Test set loss: 111.3463
+Sample on GPU
+Train Epoch: 5 [0/60000 (0%)]   Loss: 118.070176
+Train Epoch: 5 [5000/60000 (8%)]        Loss: 124.760039
+Train Epoch: 5 [10000/60000 (17%)]      Loss: 125.741445
+Train Epoch: 5 [15000/60000 (25%)]      Loss: 127.198740
+Train Epoch: 5 [20000/60000 (33%)]      Loss: 122.983115
+Train Epoch: 5 [25000/60000 (42%)]      Loss: 128.411895
+Train Epoch: 5 [30000/60000 (50%)]      Loss: 124.867188
+Train Epoch: 5 [35000/60000 (58%)]      Loss: 125.705137
+Train Epoch: 5 [40000/60000 (67%)]      Loss: 122.048984
+Train Epoch: 5 [45000/60000 (75%)]      Loss: 127.124971
+Train Epoch: 5 [50000/60000 (83%)]      Loss: 119.792676
+Train Epoch: 5 [55000/60000 (92%)]      Loss: 119.846279
+====&gt; Epoch: 5 Average loss: 123.0701
+====&gt; Test set loss: 108.9966
+Sample on GPU
+Train Epoch: 6 [0/60000 (0%)]   Loss: 123.376191
+Train Epoch: 6 [5000/60000 (8%)]        Loss: 121.417881
+Train Epoch: 6 [10000/60000 (17%)]      Loss: 124.787275
+Train Epoch: 6 [15000/60000 (25%)]      Loss: 121.090742
+Train Epoch: 6 [20000/60000 (33%)]      Loss: 120.030879
+Train Epoch: 6 [25000/60000 (42%)]      Loss: 125.354854
+Train Epoch: 6 [30000/60000 (50%)]      Loss: 120.402920
+Train Epoch: 6 [35000/60000 (58%)]      Loss: 122.679316
+Train Epoch: 6 [40000/60000 (67%)]      Loss: 121.951025
+Train Epoch: 6 [45000/60000 (75%)]      Loss: 124.087363
+Train Epoch: 6 [50000/60000 (83%)]      Loss: 122.723252
+Train Epoch: 6 [55000/60000 (92%)]      Loss: 122.921533
+====&gt; Epoch: 6 Average loss: 121.0709
+====&gt; Test set loss: 107.6328
+Sample on GPU
+Train Epoch: 7 [0/60000 (0%)]   Loss: 120.901445
+Train Epoch: 7 [5000/60000 (8%)]        Loss: 118.667402
+Train Epoch: 7 [10000/60000 (17%)]      Loss: 119.263633
+Train Epoch: 7 [15000/60000 (25%)]      Loss: 119.063867
+Train Epoch: 7 [20000/60000 (33%)]      Loss: 120.433203
+Train Epoch: 7 [25000/60000 (42%)]      Loss: 115.278076
+Train Epoch: 7 [30000/60000 (50%)]      Loss: 121.793330
+Train Epoch: 7 [35000/60000 (58%)]      Loss: 116.526328
+Train Epoch: 7 [40000/60000 (67%)]      Loss: 118.894434
+Train Epoch: 7 [45000/60000 (75%)]      Loss: 117.653691
+Train Epoch: 7 [50000/60000 (83%)]      Loss: 122.455420
+Train Epoch: 7 [55000/60000 (92%)]      Loss: 124.912070
+====&gt; Epoch: 7 Average loss: 119.3773
+====&gt; Test set loss: 106.4224
+Sample on GPU
+Train Epoch: 8 [0/60000 (0%)]   Loss: 119.581777
+Train Epoch: 8 [5000/60000 (8%)]        Loss: 118.859141
+Train Epoch: 8 [10000/60000 (17%)]      Loss: 118.007842
+Train Epoch: 8 [15000/60000 (25%)]      Loss: 118.337891
+Train Epoch: 8 [20000/60000 (33%)]      Loss: 118.954258
+Train Epoch: 8 [25000/60000 (42%)]      Loss: 121.013535
+Train Epoch: 8 [30000/60000 (50%)]      Loss: 119.810176
+Train Epoch: 8 [35000/60000 (58%)]      Loss: 119.841299
+Train Epoch: 8 [40000/60000 (67%)]      Loss: 120.076016
+Train Epoch: 8 [45000/60000 (75%)]      Loss: 117.737617
+Train Epoch: 8 [50000/60000 (83%)]      Loss: 111.667871
+Train Epoch: 8 [55000/60000 (92%)]      Loss: 115.236387
+====&gt; Epoch: 8 Average loss: 117.9189
+====&gt; Test set loss: 104.7320
+Sample on GPU
+Train Epoch: 9 [0/60000 (0%)]   Loss: 116.918447
+Train Epoch: 9 [5000/60000 (8%)]        Loss: 117.809453
+Train Epoch: 9 [10000/60000 (17%)]      Loss: 114.873613
+Train Epoch: 9 [15000/60000 (25%)]      Loss: 114.688574
+Train Epoch: 9 [20000/60000 (33%)]      Loss: 118.524883
+Train Epoch: 9 [25000/60000 (42%)]      Loss: 119.084492
+Train Epoch: 9 [30000/60000 (50%)]      Loss: 117.798965
+Train Epoch: 9 [35000/60000 (58%)]      Loss: 121.597891
+Train Epoch: 9 [40000/60000 (67%)]      Loss: 122.524512
+Train Epoch: 9 [45000/60000 (75%)]      Loss: 118.416816
+Train Epoch: 9 [50000/60000 (83%)]      Loss: 115.303115
+Train Epoch: 9 [55000/60000 (92%)]      Loss: 116.437588
+====&gt; Epoch: 9 Average loss: 116.6586
+====&gt; Test set loss: 103.5867
+Sample on GPU
+Train Epoch: 10 [0/60000 (0%)]  Loss: 119.007197
+Train Epoch: 10 [5000/60000 (8%)]       Loss: 113.158838
+Train Epoch: 10 [10000/60000 (17%)]     Loss: 117.677520
+Train Epoch: 10 [15000/60000 (25%)]     Loss: 112.093789
+Train Epoch: 10 [20000/60000 (33%)]     Loss: 111.669619
+Train Epoch: 10 [25000/60000 (42%)]     Loss: 117.250703
+Train Epoch: 10 [30000/60000 (50%)]     Loss: 117.931270
+Train Epoch: 10 [35000/60000 (58%)]     Loss: 113.926602
+Train Epoch: 10 [40000/60000 (67%)]     Loss: 115.036895
+Train Epoch: 10 [45000/60000 (75%)]     Loss: 114.448105
+Train Epoch: 10 [50000/60000 (83%)]     Loss: 113.384209
+Train Epoch: 10 [55000/60000 (92%)]     Loss: 115.109258
+====&gt; Epoch: 10 Average loss: 115.6179
+====&gt; Test set loss: 102.5347
+Sample on GPU
+Train Epoch: 11 [0/60000 (0%)]  Loss: 115.973164
+Train Epoch: 11 [5000/60000 (8%)]       Loss: 113.999727
+Train Epoch: 11 [10000/60000 (17%)]     Loss: 115.067559
+Train Epoch: 11 [15000/60000 (25%)]     Loss: 111.597480
+Train Epoch: 11 [20000/60000 (33%)]     Loss: 118.009883
+Train Epoch: 11 [25000/60000 (42%)]     Loss: 113.662188
+Train Epoch: 11 [30000/60000 (50%)]     Loss: 115.732070
+Train Epoch: 11 [35000/60000 (58%)]     Loss: 112.625615
+Train Epoch: 11 [40000/60000 (67%)]     Loss: 114.414678
+Train Epoch: 11 [45000/60000 (75%)]     Loss: 115.971953
+Train Epoch: 11 [50000/60000 (83%)]     Loss: 112.430684
+Train Epoch: 11 [55000/60000 (92%)]     Loss: 116.626172
+====&gt; Epoch: 11 Average loss: 114.6012
+====&gt; Test set loss: 101.5754
+Sample on GPU
+Train Epoch: 12 [0/60000 (0%)]  Loss: 109.092969
+Train Epoch: 12 [5000/60000 (8%)]       Loss: 114.426992
+Train Epoch: 12 [10000/60000 (17%)]     Loss: 115.947852
+Train Epoch: 12 [15000/60000 (25%)]     Loss: 119.514746
+Train Epoch: 12 [20000/60000 (33%)]     Loss: 114.657441
+Train Epoch: 12 [25000/60000 (42%)]     Loss: 114.954844
+Train Epoch: 12 [30000/60000 (50%)]     Loss: 107.224150
+Train Epoch: 12 [35000/60000 (58%)]     Loss: 121.073828
+Train Epoch: 12 [40000/60000 (67%)]     Loss: 111.048867
+Train Epoch: 12 [45000/60000 (75%)]     Loss: 115.262656
+Train Epoch: 12 [50000/60000 (83%)]     Loss: 114.928574
+Train Epoch: 12 [55000/60000 (92%)]     Loss: 114.783037
+====&gt; Epoch: 12 Average loss: 113.7318
+====&gt; Test set loss: 101.1892
+Sample on GPU
+Train Epoch: 13 [0/60000 (0%)]  Loss: 118.609141
+Train Epoch: 13 [5000/60000 (8%)]       Loss: 111.601230
+Train Epoch: 13 [10000/60000 (17%)]     Loss: 119.184893
+Train Epoch: 13 [15000/60000 (25%)]     Loss: 120.209131
+Train Epoch: 13 [20000/60000 (33%)]     Loss: 115.739639
+Train Epoch: 13 [25000/60000 (42%)]     Loss: 113.177598
+Train Epoch: 13 [30000/60000 (50%)]     Loss: 112.005469
+Train Epoch: 13 [35000/60000 (58%)]     Loss: 114.875459
+Train Epoch: 13 [40000/60000 (67%)]     Loss: 113.063203
+Train Epoch: 13 [45000/60000 (75%)]     Loss: 113.491377
+Train Epoch: 13 [50000/60000 (83%)]     Loss: 115.477578
+Train Epoch: 13 [55000/60000 (92%)]     Loss: 109.179736
+====&gt; Epoch: 13 Average loss: 113.0426
+====&gt; Test set loss: 100.6240
+Sample on GPU
+Train Epoch: 14 [0/60000 (0%)]  Loss: 110.676230
+Train Epoch: 14 [5000/60000 (8%)]       Loss: 111.083066
+Train Epoch: 14 [10000/60000 (17%)]     Loss: 109.503379
+Train Epoch: 14 [15000/60000 (25%)]     Loss: 110.952539
+Train Epoch: 14 [20000/60000 (33%)]     Loss: 117.603447
+Train Epoch: 14 [25000/60000 (42%)]     Loss: 112.346240
+Train Epoch: 14 [30000/60000 (50%)]     Loss: 106.642422
+Train Epoch: 14 [35000/60000 (58%)]     Loss: 115.706289
+Train Epoch: 14 [40000/60000 (67%)]     Loss: 110.074453
+Train Epoch: 14 [45000/60000 (75%)]     Loss: 118.016377
+Train Epoch: 14 [50000/60000 (83%)]     Loss: 113.165303
+Train Epoch: 14 [55000/60000 (92%)]     Loss: 112.421396
+====&gt; Epoch: 14 Average loss: 112.3610
+====&gt; Test set loss: 100.4810
+Sample on GPU
+Train Epoch: 15 [0/60000 (0%)]  Loss: 114.288418
+Train Epoch: 15 [5000/60000 (8%)]       Loss: 110.386504
+Train Epoch: 15 [10000/60000 (17%)]     Loss: 111.136553
+Train Epoch: 15 [15000/60000 (25%)]     Loss: 113.847832
+Train Epoch: 15 [20000/60000 (33%)]     Loss: 109.434756
+Train Epoch: 15 [25000/60000 (42%)]     Loss: 111.680547
+Train Epoch: 15 [30000/60000 (50%)]     Loss: 108.479775
+Train Epoch: 15 [35000/60000 (58%)]     Loss: 112.162031
+Train Epoch: 15 [40000/60000 (67%)]     Loss: 111.171338
+Train Epoch: 15 [45000/60000 (75%)]     Loss: 112.110371
+Train Epoch: 15 [50000/60000 (83%)]     Loss: 112.513164
+Train Epoch: 15 [55000/60000 (92%)]     Loss: 111.992529
+====&gt; Epoch: 15 Average loss: 111.7808
+====&gt; Test set loss: 99.5134
+Sample on GPU
+Train Epoch: 16 [0/60000 (0%)]  Loss: 111.848770
+Train Epoch: 16 [5000/60000 (8%)]       Loss: 110.022568
+Train Epoch: 16 [10000/60000 (17%)]     Loss: 108.910273
+Train Epoch: 16 [15000/60000 (25%)]     Loss: 108.284023
+Train Epoch: 16 [20000/60000 (33%)]     Loss: 104.350020
+Train Epoch: 16 [25000/60000 (42%)]     Loss: 113.162676
+Train Epoch: 16 [30000/60000 (50%)]     Loss: 113.064473
+Train Epoch: 16 [35000/60000 (58%)]     Loss: 111.306670
+Train Epoch: 16 [40000/60000 (67%)]     Loss: 112.678926
+Train Epoch: 16 [45000/60000 (75%)]     Loss: 114.548906
+Train Epoch: 16 [50000/60000 (83%)]     Loss: 111.353613
+Train Epoch: 16 [55000/60000 (92%)]     Loss: 114.985176
+====&gt; Epoch: 16 Average loss: 111.3042
+====&gt; Test set loss: 99.1668
+Sample on GPU
+Train Epoch: 17 [0/60000 (0%)]  Loss: 113.071738
+Train Epoch: 17 [5000/60000 (8%)]       Loss: 106.413457
+Train Epoch: 17 [10000/60000 (17%)]     Loss: 107.572471
+Train Epoch: 17 [15000/60000 (25%)]     Loss: 111.274629
+Train Epoch: 17 [20000/60000 (33%)]     Loss: 112.332363
+Train Epoch: 17 [25000/60000 (42%)]     Loss: 110.184531
+Train Epoch: 17 [30000/60000 (50%)]     Loss: 111.192227
+Train Epoch: 17 [35000/60000 (58%)]     Loss: 112.801992
+Train Epoch: 17 [40000/60000 (67%)]     Loss: 109.504336
+Train Epoch: 17 [45000/60000 (75%)]     Loss: 108.719746
+Train Epoch: 17 [50000/60000 (83%)]     Loss: 107.494512
+Train Epoch: 17 [55000/60000 (92%)]     Loss: 108.757656
+====&gt; Epoch: 17 Average loss: 110.8204
+====&gt; Test set loss: 98.5510
+Sample on GPU
+Train Epoch: 18 [0/60000 (0%)]  Loss: 114.101816
+Train Epoch: 18 [5000/60000 (8%)]       Loss: 110.502129
+Train Epoch: 18 [10000/60000 (17%)]     Loss: 116.731436
+Train Epoch: 18 [15000/60000 (25%)]     Loss: 109.721934
+Train Epoch: 18 [20000/60000 (33%)]     Loss: 110.199092
+Train Epoch: 18 [25000/60000 (42%)]     Loss: 111.472344
+Train Epoch: 18 [30000/60000 (50%)]     Loss: 110.084082
+Train Epoch: 18 [35000/60000 (58%)]     Loss: 108.175020
+Train Epoch: 18 [40000/60000 (67%)]     Loss: 109.334990
+Train Epoch: 18 [45000/60000 (75%)]     Loss: 113.755195
+Train Epoch: 18 [50000/60000 (83%)]     Loss: 112.021162
+Train Epoch: 18 [55000/60000 (92%)]     Loss: 109.488398
+====&gt; Epoch: 18 Average loss: 110.4053
+====&gt; Test set loss: 98.5775
+Sample on GPU
+Train Epoch: 19 [0/60000 (0%)]  Loss: 108.968320
+Train Epoch: 19 [5000/60000 (8%)]       Loss: 113.404473
+Train Epoch: 19 [10000/60000 (17%)]     Loss: 110.942969
+Train Epoch: 19 [15000/60000 (25%)]     Loss: 108.818789
+Train Epoch: 19 [20000/60000 (33%)]     Loss: 116.121768
+Train Epoch: 19 [25000/60000 (42%)]     Loss: 110.135635
+Train Epoch: 19 [30000/60000 (50%)]     Loss: 106.636279
+Train Epoch: 19 [35000/60000 (58%)]     Loss: 114.024424
+Train Epoch: 19 [40000/60000 (67%)]     Loss: 110.561748
+Train Epoch: 19 [45000/60000 (75%)]     Loss: 111.707852
+Train Epoch: 19 [50000/60000 (83%)]     Loss: 110.478516
+Train Epoch: 19 [55000/60000 (92%)]     Loss: 110.430928
+====&gt; Epoch: 19 Average loss: 110.0112
+====&gt; Test set loss: 98.3443
+Sample on GPU
+Train Epoch: 20 [0/60000 (0%)]  Loss: 113.032119
+Train Epoch: 20 [5000/60000 (8%)]       Loss: 104.147461
+Train Epoch: 20 [10000/60000 (17%)]     Loss: 114.323867
+Train Epoch: 20 [15000/60000 (25%)]     Loss: 108.811641
+Train Epoch: 20 [20000/60000 (33%)]     Loss: 108.609297
+Train Epoch: 20 [25000/60000 (42%)]     Loss: 106.700723
+Train Epoch: 20 [30000/60000 (50%)]     Loss: 109.543975
+Train Epoch: 20 [35000/60000 (58%)]     Loss: 110.430615
+Train Epoch: 20 [40000/60000 (67%)]     Loss: 109.569385
+Train Epoch: 20 [45000/60000 (75%)]     Loss: 111.983564
+Train Epoch: 20 [50000/60000 (83%)]     Loss: 108.802031
+Train Epoch: 20 [55000/60000 (92%)]     Loss: 106.646172
+====&gt; Epoch: 20 Average loss: 109.6779
+====&gt; Test set loss: 98.0308
+Sample on GPU
+Train Epoch: 21 [0/60000 (0%)]  Loss: 109.854766
+Train Epoch: 21 [5000/60000 (8%)]       Loss: 106.341367
+Train Epoch: 21 [10000/60000 (17%)]     Loss: 114.258809
+Train Epoch: 21 [15000/60000 (25%)]     Loss: 110.608594
+Train Epoch: 21 [20000/60000 (33%)]     Loss: 107.471670
+Train Epoch: 21 [25000/60000 (42%)]     Loss: 109.425713
+Train Epoch: 21 [30000/60000 (50%)]     Loss: 108.759629
+Train Epoch: 21 [35000/60000 (58%)]     Loss: 108.509219
+Train Epoch: 21 [40000/60000 (67%)]     Loss: 107.609424
+Train Epoch: 21 [45000/60000 (75%)]     Loss: 110.648467
+Train Epoch: 21 [50000/60000 (83%)]     Loss: 111.064941
+Train Epoch: 21 [55000/60000 (92%)]     Loss: 112.328105
+====&gt; Epoch: 21 Average loss: 109.3153
+====&gt; Test set loss: 97.6033
+Sample on GPU
+Train Epoch: 22 [0/60000 (0%)]  Loss: 110.227480
+Train Epoch: 22 [5000/60000 (8%)]       Loss: 112.057148
+Train Epoch: 22 [10000/60000 (17%)]     Loss: 106.626777
+Train Epoch: 22 [15000/60000 (25%)]     Loss: 110.031816
+Train Epoch: 22 [20000/60000 (33%)]     Loss: 111.648340
+Train Epoch: 22 [25000/60000 (42%)]     Loss: 110.972598
+Train Epoch: 22 [30000/60000 (50%)]     Loss: 109.725908
+Train Epoch: 22 [35000/60000 (58%)]     Loss: 106.489570
+Train Epoch: 22 [40000/60000 (67%)]     Loss: 108.777871
+Train Epoch: 22 [45000/60000 (75%)]     Loss: 111.938477
+Train Epoch: 22 [50000/60000 (83%)]     Loss: 110.338418
+Train Epoch: 22 [55000/60000 (92%)]     Loss: 107.602607
+====&gt; Epoch: 22 Average loss: 109.0050
+====&gt; Test set loss: 97.1001
+Sample on GPU
+Train Epoch: 23 [0/60000 (0%)]  Loss: 109.250078
+Train Epoch: 23 [5000/60000 (8%)]       Loss: 108.446582
+Train Epoch: 23 [10000/60000 (17%)]     Loss: 107.454463
+Train Epoch: 23 [15000/60000 (25%)]     Loss: 112.557227
+Train Epoch: 23 [20000/60000 (33%)]     Loss: 106.738164
+Train Epoch: 23 [25000/60000 (42%)]     Loss: 108.020410
+Train Epoch: 23 [30000/60000 (50%)]     Loss: 114.396260
+Train Epoch: 23 [35000/60000 (58%)]     Loss: 113.794297
+Train Epoch: 23 [40000/60000 (67%)]     Loss: 107.961270
+Train Epoch: 23 [45000/60000 (75%)]     Loss: 108.909199
+Train Epoch: 23 [50000/60000 (83%)]     Loss: 107.355273
+Train Epoch: 23 [55000/60000 (92%)]     Loss: 115.306660
+====&gt; Epoch: 23 Average loss: 108.6858
+====&gt; Test set loss: 96.9834
+Sample on GPU
+Train Epoch: 24 [0/60000 (0%)]  Loss: 104.124521
+Train Epoch: 24 [5000/60000 (8%)]       Loss: 113.637764
+Train Epoch: 24 [10000/60000 (17%)]     Loss: 107.666279
+Train Epoch: 24 [15000/60000 (25%)]     Loss: 107.608047
+Train Epoch: 24 [20000/60000 (33%)]     Loss: 104.709844
+Train Epoch: 24 [25000/60000 (42%)]     Loss: 108.735078
+Train Epoch: 24 [30000/60000 (50%)]     Loss: 103.719209
+Train Epoch: 24 [35000/60000 (58%)]     Loss: 109.727529
+Train Epoch: 24 [40000/60000 (67%)]     Loss: 107.243682
+Train Epoch: 24 [45000/60000 (75%)]     Loss: 104.815273
+Train Epoch: 24 [50000/60000 (83%)]     Loss: 105.261484
+Train Epoch: 24 [55000/60000 (92%)]     Loss: 110.247217
+====&gt; Epoch: 24 Average loss: 108.4447
+====&gt; Test set loss: 96.8342
+Sample on GPU
+Train Epoch: 25 [0/60000 (0%)]  Loss: 108.851328
+Train Epoch: 25 [5000/60000 (8%)]       Loss: 109.703984
+Train Epoch: 25 [10000/60000 (17%)]     Loss: 103.821172
+Train Epoch: 25 [15000/60000 (25%)]     Loss: 105.659219
+Train Epoch: 25 [20000/60000 (33%)]     Loss: 103.759502
+Train Epoch: 25 [25000/60000 (42%)]     Loss: 105.917695
+Train Epoch: 25 [30000/60000 (50%)]     Loss: 108.533730
+Train Epoch: 25 [35000/60000 (58%)]     Loss: 106.891553
+Train Epoch: 25 [40000/60000 (67%)]     Loss: 109.926387
+Train Epoch: 25 [45000/60000 (75%)]     Loss: 105.948711
+Train Epoch: 25 [50000/60000 (83%)]     Loss: 108.738857
+Train Epoch: 25 [55000/60000 (92%)]     Loss: 108.328301
+====&gt; Epoch: 25 Average loss: 108.1921
+====&gt; Test set loss: 96.7131
+Sample on GPU
+Train Epoch: 26 [0/60000 (0%)]  Loss: 104.502744
+Train Epoch: 26 [5000/60000 (8%)]       Loss: 109.905586
+Train Epoch: 26 [10000/60000 (17%)]     Loss: 107.276357
+Train Epoch: 26 [15000/60000 (25%)]     Loss: 109.931309
+Train Epoch: 26 [20000/60000 (33%)]     Loss: 108.138145
+Train Epoch: 26 [25000/60000 (42%)]     Loss: 104.338848
+Train Epoch: 26 [30000/60000 (50%)]     Loss: 108.306162
+Train Epoch: 26 [35000/60000 (58%)]     Loss: 114.699805
+Train Epoch: 26 [40000/60000 (67%)]     Loss: 107.933301
+Train Epoch: 26 [45000/60000 (75%)]     Loss: 114.740322
+Train Epoch: 26 [50000/60000 (83%)]     Loss: 107.517031
+Train Epoch: 26 [55000/60000 (92%)]     Loss: 108.300723
+====&gt; Epoch: 26 Average loss: 107.9237
+====&gt; Test set loss: 96.4463
+Sample on GPU
+Train Epoch: 27 [0/60000 (0%)]  Loss: 103.437109
+Train Epoch: 27 [5000/60000 (8%)]       Loss: 105.573164
+Train Epoch: 27 [10000/60000 (17%)]     Loss: 107.309668
+Train Epoch: 27 [15000/60000 (25%)]     Loss: 107.395840
+Train Epoch: 27 [20000/60000 (33%)]     Loss: 107.362920
+Train Epoch: 27 [25000/60000 (42%)]     Loss: 104.696621
+Train Epoch: 27 [30000/60000 (50%)]     Loss: 104.728154
+Train Epoch: 27 [35000/60000 (58%)]     Loss: 101.233437
+Train Epoch: 27 [40000/60000 (67%)]     Loss: 107.948047
+Train Epoch: 27 [45000/60000 (75%)]     Loss: 112.182822
+Train Epoch: 27 [50000/60000 (83%)]     Loss: 104.286270
+Train Epoch: 27 [55000/60000 (92%)]     Loss: 108.214258
+====&gt; Epoch: 27 Average loss: 107.7503
+====&gt; Test set loss: 96.3530
+Sample on GPU
+Train Epoch: 28 [0/60000 (0%)]  Loss: 108.140176
+Train Epoch: 28 [5000/60000 (8%)]       Loss: 104.706475
+Train Epoch: 28 [10000/60000 (17%)]     Loss: 107.137754
+Train Epoch: 28 [15000/60000 (25%)]     Loss: 107.753682
+Train Epoch: 28 [20000/60000 (33%)]     Loss: 105.019023
+Train Epoch: 28 [25000/60000 (42%)]     Loss: 108.945918
+Train Epoch: 28 [30000/60000 (50%)]     Loss: 104.847764
+Train Epoch: 28 [35000/60000 (58%)]     Loss: 105.674873
+Train Epoch: 28 [40000/60000 (67%)]     Loss: 107.728145
+Train Epoch: 28 [45000/60000 (75%)]     Loss: 105.697695
+Train Epoch: 28 [50000/60000 (83%)]     Loss: 103.083984
+Train Epoch: 28 [55000/60000 (92%)]     Loss: 111.279297
+====&gt; Epoch: 28 Average loss: 107.5280
+====&gt; Test set loss: 96.0785
+Sample on GPU
+Train Epoch: 29 [0/60000 (0%)]  Loss: 105.757158
+Train Epoch: 29 [5000/60000 (8%)]       Loss: 106.214453
+Train Epoch: 29 [10000/60000 (17%)]     Loss: 112.182402
+Train Epoch: 29 [15000/60000 (25%)]     Loss: 109.398828
+Train Epoch: 29 [20000/60000 (33%)]     Loss: 105.531895
+Train Epoch: 29 [25000/60000 (42%)]     Loss: 108.774746
+Train Epoch: 29 [30000/60000 (50%)]     Loss: 106.003379
+Train Epoch: 29 [35000/60000 (58%)]     Loss: 106.026914
+Train Epoch: 29 [40000/60000 (67%)]     Loss: 106.584629
+Train Epoch: 29 [45000/60000 (75%)]     Loss: 109.117129
+Train Epoch: 29 [50000/60000 (83%)]     Loss: 108.743301
+Train Epoch: 29 [55000/60000 (92%)]     Loss: 112.534492
+====&gt; Epoch: 29 Average loss: 107.3225
+====&gt; Test set loss: 96.1219
+Sample on GPU
+Train Epoch: 30 [0/60000 (0%)]  Loss: 106.962344
+Train Epoch: 30 [5000/60000 (8%)]       Loss: 103.144756
+Train Epoch: 30 [10000/60000 (17%)]     Loss: 105.689434
+Train Epoch: 30 [15000/60000 (25%)]     Loss: 110.968066
+Train Epoch: 30 [20000/60000 (33%)]     Loss: 110.087158
+Train Epoch: 30 [25000/60000 (42%)]     Loss: 107.979219
+Train Epoch: 30 [30000/60000 (50%)]     Loss: 108.269834
+Train Epoch: 30 [35000/60000 (58%)]     Loss: 104.630352
+Train Epoch: 30 [40000/60000 (67%)]     Loss: 110.115830
+Train Epoch: 30 [45000/60000 (75%)]     Loss: 104.596367
+Train Epoch: 30 [50000/60000 (83%)]     Loss: 109.423359
+Train Epoch: 30 [55000/60000 (92%)]     Loss: 111.539482
+====&gt; Epoch: 30 Average loss: 107.1780
+====&gt; Test set loss: 95.9390
+Sample on GPU
+Train Epoch: 31 [0/60000 (0%)]  Loss: 106.842744
+Train Epoch: 31 [5000/60000 (8%)]       Loss: 109.158066
+Train Epoch: 31 [10000/60000 (17%)]     Loss: 102.012187
+Train Epoch: 31 [15000/60000 (25%)]     Loss: 112.724707
+Train Epoch: 31 [20000/60000 (33%)]     Loss: 112.593203
+Train Epoch: 31 [25000/60000 (42%)]     Loss: 107.925723
+Train Epoch: 31 [30000/60000 (50%)]     Loss: 107.634883
+Train Epoch: 31 [35000/60000 (58%)]     Loss: 108.361211
+Train Epoch: 31 [40000/60000 (67%)]     Loss: 108.277061
+Train Epoch: 31 [45000/60000 (75%)]     Loss: 105.505010
+Train Epoch: 31 [50000/60000 (83%)]     Loss: 109.611025
+Train Epoch: 31 [55000/60000 (92%)]     Loss: 108.760039
+====&gt; Epoch: 31 Average loss: 107.0195
+====&gt; Test set loss: 95.8913
+Sample on GPU
+Train Epoch: 32 [0/60000 (0%)]  Loss: 102.438936
+Train Epoch: 32 [5000/60000 (8%)]       Loss: 104.865273
+Train Epoch: 32 [10000/60000 (17%)]     Loss: 106.378887
+Train Epoch: 32 [15000/60000 (25%)]     Loss: 105.893555
+Train Epoch: 32 [20000/60000 (33%)]     Loss: 107.292832
+Train Epoch: 32 [25000/60000 (42%)]     Loss: 105.097734
+Train Epoch: 32 [30000/60000 (50%)]     Loss: 106.793594
+Train Epoch: 32 [35000/60000 (58%)]     Loss: 103.651992
+Train Epoch: 32 [40000/60000 (67%)]     Loss: 104.603242
+Train Epoch: 32 [45000/60000 (75%)]     Loss: 104.787109
+Train Epoch: 32 [50000/60000 (83%)]     Loss: 105.223008
+Train Epoch: 32 [55000/60000 (92%)]     Loss: 104.616162
+====&gt; Epoch: 32 Average loss: 106.8328
+====&gt; Test set loss: 95.6484
+Sample on GPU
+Train Epoch: 33 [0/60000 (0%)]  Loss: 106.132139
+Train Epoch: 33 [5000/60000 (8%)]       Loss: 105.233721
+Train Epoch: 33 [10000/60000 (17%)]     Loss: 105.989355
+Train Epoch: 33 [15000/60000 (25%)]     Loss: 107.879063
+Train Epoch: 33 [20000/60000 (33%)]     Loss: 106.138437
+Train Epoch: 33 [25000/60000 (42%)]     Loss: 108.237773
+Train Epoch: 33 [30000/60000 (50%)]     Loss: 102.599648
+Train Epoch: 33 [35000/60000 (58%)]     Loss: 103.175020
+Train Epoch: 33 [40000/60000 (67%)]     Loss: 107.864121
+Train Epoch: 33 [45000/60000 (75%)]     Loss: 106.985898
+Train Epoch: 33 [50000/60000 (83%)]     Loss: 110.403477
+Train Epoch: 33 [55000/60000 (92%)]     Loss: 104.671211
+====&gt; Epoch: 33 Average loss: 106.6582
+====&gt; Test set loss: 95.3840
+Sample on GPU
+Train Epoch: 34 [0/60000 (0%)]  Loss: 106.792900
+Train Epoch: 34 [5000/60000 (8%)]       Loss: 105.106309
+Train Epoch: 34 [10000/60000 (17%)]     Loss: 104.476348
+Train Epoch: 34 [15000/60000 (25%)]     Loss: 103.731104
+Train Epoch: 34 [20000/60000 (33%)]     Loss: 108.533477
+Train Epoch: 34 [25000/60000 (42%)]     Loss: 109.952705
+Train Epoch: 34 [30000/60000 (50%)]     Loss: 105.930098
+Train Epoch: 34 [35000/60000 (58%)]     Loss: 101.907695
+Train Epoch: 34 [40000/60000 (67%)]     Loss: 108.085801
+Train Epoch: 34 [45000/60000 (75%)]     Loss: 104.987451
+Train Epoch: 34 [50000/60000 (83%)]     Loss: 110.561104
+Train Epoch: 34 [55000/60000 (92%)]     Loss: 106.005938
+====&gt; Epoch: 34 Average loss: 106.4592
+====&gt; Test set loss: 95.6551
+Sample on GPU
+Performing early stopping ..
+</pre></div></div>
+</div>
+<div class="section" id="Model-Evaluation">
+<h2>Model Evaluation<a class="headerlink" href="#Model-Evaluation" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+<div class="section" id="Optimizer-stats">
+<h1>Optimizer stats<a class="headerlink" href="#Optimizer-stats" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">optimizer</span><span class="o">.</span><span class="n">show_stats</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_MNIST_Autoencoder_GPU_13_0.png" src="../_images/notebooks_MNIST_Autoencoder_GPU_13_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Save-Model-and-Gifs">
+<h1>Save Model and Gifs<a class="headerlink" href="#Save-Model-and-Gifs" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model_vae_</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;data/models&quot;</span> <span class="o">+</span> <span class="s1">&#39;/VAE_36hidden_Adam_1e-4_GPU_80epochs.pkl&#39;</span><span class="p">)</span>
+<span class="c1"># ... after training, save your model</span>
+<span class="c1">#model.save_state_dict(&#39;mytraining.pt&#39;)</span>
+<span class="c1"># .. to load your previously training model:</span>
+<span class="c1">#model.load_state_dict(torch.load(&#39;mytraining.pt&#39;))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">image_gif</span> <span class="o">=</span> <span class="n">Visualize</span><span class="o">.</span><span class="n">make_gif</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Load-Model">
+<h1>Load Model<a class="headerlink" href="#Load-Model" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li>Loads trained model from disk</li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">m_loaded</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="s2">&quot;data/models&quot;</span> <span class="o">+</span> <span class="s1">&#39;/VAE_36hidden_Adam_1e-4_GPU_80epochs.pkl&#39;</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="n">m_loaded</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[11]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>odict_keys([&#39;encoder.layer1.weight&#39;, &#39;encoder.layer1.bias&#39;, &#39;encoder.layer3_mu.weight&#39;, &#39;encoder.layer3_mu.bias&#39;, &#39;encoder.layer3_logvar.weight&#39;, &#39;encoder.layer3_logvar.bias&#39;, &#39;decoder.layer1.weight&#39;, &#39;decoder.layer1.bias&#39;, &#39;decoder.layer3.weight&#39;, &#39;decoder.layer3.bias&#39;])
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model_vae_original_</span> <span class="o">=</span> <span class="n">VAE</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span><span class="n">decoder</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+<span class="n">model_vae_original_</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">m_loaded</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Save-the-encoding-as-.npy-arrays-with-their-labels-by-applying-the-learned-VAE">
+<h1>Save the encoding as .npy arrays with their labels by applying the learned VAE<a class="headerlink" href="#Save-the-encoding-as-.npy-arrays-with-their-labels-by-applying-the-learned-VAE" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">Train</span> <span class="ow">and</span> <span class="n">Test</span> <span class="ow">and</span> <span class="n">keep</span> <span class="n">them</span> <span class="n">separate</span><span class="o">.</span> <span class="n">Full</span> <span class="n">MNIST</span> <span class="n">to</span> <span class="n">a</span> <span class="n">vector</span> <span class="n">of</span> <span class="mi">28</span> <span class="o">-</span> <span class="n">so</span> <span class="n">this</span> <span class="ow">is</span> <span class="n">actually</span> <span class="n">a</span> <span class="n">lot</span> <span class="n">smaller</span> <span class="n">than</span> <span class="mi">64</span> <span class="n">what</span> <span class="n">was</span> <span class="n">originally</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">SIFT</span> <span class="n">descriptor</span> <span class="p">(</span><span class="mi">8</span><span class="n">x8</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span> <span class="o">=</span> <span class="n">MNIST_Loader</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span> <span class="o">=</span> <span class="n">dataiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+<span class="n">dataiter_test</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">test_loader</span><span class="p">)</span>
+<span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">dataiter_test</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">if</span> <span class="n">gpu</span><span class="p">:</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data on GPU&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Data on GPU
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">x</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">784</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">x</span><span class="o">.</span><span class="n">type</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[12]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&#39;torch.cuda.FloatTensor&#39;
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">encoded_mean</span><span class="p">,</span> <span class="n">logvar</span> <span class="o">=</span> <span class="n">model_vae_original_</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">X_train</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">784</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">encoded_mean</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logvar</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">Y_train</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+torch.Size([1000, 36])
+torch.Size([1000, 36])
+torch.Size([1000])
+</pre></div></div>
+</div>
+<p>### Save encoding in .npy arrays</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">data_path</span><span class="o">+</span><span class="s2">&quot;X_train_mu_36.npy&quot;</span><span class="p">,</span><span class="n">encoded_mean</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">data_path</span><span class="o">+</span><span class="s2">&quot;X_train_logvar_36.npy&quot;</span><span class="p">,</span><span class="n">logvar</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">data_path</span><span class="o">+</span><span class="s2">&quot;Y_train_36.npy&quot;</span><span class="p">,</span><span class="n">Y_train</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Load-Model">
+<h1>Load Model<a class="headerlink" href="#Load-Model" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Model</span> <span class="n">needs</span> <span class="n">to</span> <span class="n">exist</span> <span class="n">first</span>
+</pre></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [41]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">test_loader</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[41]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>torch.Size([100, 1, 28, 28])
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">dataiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[40]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&#39;torch.FloatTensor&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Plot-the-latent-space">
+<h1>Plot the latent space<a class="headerlink" href="#Plot-the-latent-space" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">First</span> <span class="n">change</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">points</span> <span class="n">you</span> <span class="n">plot</span> <span class="n">by</span> <span class="n">selecting</span> <span class="mi">10000</span>
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span> <span class="o">=</span> <span class="n">MNIST_Loader</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">dataiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+<span class="c1"># Feed a new batch of images and get the mean and logvar of the latent space.</span>
+<span class="c1"># This gives you the parameters of the Gaussian</span>
+<span class="n">mu</span><span class="p">,</span> <span class="n">logvar</span> <span class="o">=</span> <span class="n">model_vae</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="n">Visualize</span><span class="o">.</span><span class="n">plot_latent_space</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+<span class="c1"># 2. Visualize the prior predictive distribution. Fix the latent variables between [-3,3]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Plot-the-manifold">
+<h1>Plot the manifold<a class="headerlink" href="#Plot-the-manifold" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Generate</span> <span class="n">the</span> <span class="mi">2</span> <span class="n">dimensions</span> <span class="n">by</span> <span class="n">encoding</span> <span class="n">a</span> <span class="n">digit</span> <span class="n">of</span> <span class="n">your</span> <span class="n">choice</span><span class="p">,</span> <span class="n">then</span> <span class="n">perturb</span> <span class="n">the</span> <span class="n">reconstruction</span> <span class="k">with</span> <span class="n">linspace</span>
+<span class="o">*</span> <span class="n">Plot</span> <span class="n">the</span> <span class="mi">2</span> <span class="n">latent</span> <span class="n">dimensions</span><span class="o">/</span><span class="n">means</span> <span class="ow">in</span> <span class="n">space</span> <span class="k">with</span> <span class="n">the</span> <span class="n">associated</span> <span class="n">digits</span> <span class="n">they</span> <span class="n">produce</span>
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="n">no_digit</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">no_digit</span><span class="p">]</span>
+<span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">no_digit</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Visualize</span><span class="o">.</span><span class="n">plot_manifold</span><span class="p">(</span><span class="n">model_vae</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+<span class="c1"># Proof it&#39;s random but not entirely, when you generate</span>
+<span class="c1">#Visualize.imshow_batch(res.view(-1,28,28).data)</span>
+<span class="c1">#Visualize.imshow_batch(res1.view(-1,28,28).data)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># This is an example that aims to further reduce the latent space.</span>
+<span class="n">latent_data</span> <span class="o">=</span> <span class="n">LatentSpaceDataset</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">mini_train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">latent_data</span><span class="p">,</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1">#mini_data_iter = iter(mini_train_loader)</span>
+<span class="c1">#datapoint, label = mini_data_iter.next()</span>
+<span class="n">D_in_latent</span><span class="p">,</span> <span class="n">H_latent</span><span class="p">,</span> <span class="n">D_out_latent</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span>
+<span class="n">encoder1</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">D_in_latent</span><span class="p">,</span> <span class="n">H_latent</span><span class="p">,</span> <span class="n">D_out_latent</span><span class="p">)</span>
+<span class="n">decoder1</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">D_out_latent</span><span class="p">,</span> <span class="n">H_latent</span><span class="p">,</span> <span class="n">D_in_latent</span><span class="p">)</span>
+
+<span class="c1">#model_vae = VAE().to(device) - if cuda is available, but not the case, yet</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">VAE</span><span class="p">(</span><span class="n">encoder1</span><span class="p">,</span><span class="n">decoder1</span><span class="p">)</span>
+<span class="n">optimizer1</span> <span class="o">=</span> <span class="n">Optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">))</span>
+
+<span class="c1"># Generate 64 different digits. The sample is just the mean.</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">optimizer1</span><span class="o">.</span><span class="n">train_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="n">mini_train_loader</span><span class="p">)</span>
+    <span class="c1">#optimizer1.test_epoch(epoch,test_loader)</span>
+
+<span class="n">mu_latent</span><span class="p">,</span> <span class="n">logvar_latent</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">mu</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">20</span><span class="p">))</span>
+<span class="n">plot_latent_space</span><span class="p">(</span><span class="n">mu_latent</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Patric Fulop.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'58876c6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

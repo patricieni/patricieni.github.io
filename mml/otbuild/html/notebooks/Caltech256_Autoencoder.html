@@ -1,0 +1,1034 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>VAE Encoder/Decoder architecture &mdash; Metric Learning version 58876c6</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Metric Learning version 58876c6" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index_ot.html" class="icon icon-home"> Metric Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning-GPU.html">Multiscale Metric Learning - GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning.html">Multiscale Metric Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MML Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mml/mml.html">mml package</a></li>
+</ul>
+<p class="caption"><span class="caption-text">TODO List</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../doc/TODO.html">TODO List</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index_ot.html">Metric Learning</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index_ot.html">Docs</a> &raquo;</li>
+        
+      <li>VAE Encoder/Decoder architecture</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/notebooks/Caltech256_Autoencoder.ipynb" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [60]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">io</span><span class="p">,</span> <span class="n">transform</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s1">&#39;whitegrid&#39;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">imageio</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="o">%</span> <span class="n">matplotlib</span> <span class="n">inline</span>
+
+<span class="c1"># Dataset &amp; Utils</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+<span class="kn">import</span> <span class="nn">torchvision</span>
+<span class="kn">from</span> <span class="nn">torchvision</span> <span class="k">import</span> <span class="n">transforms</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">torchvision.utils</span> <span class="k">import</span> <span class="n">save_image</span>
+
+<span class="c1"># Optimizer, Functions, Distributions</span>
+<span class="kn">from</span> <span class="nn">torch.autograd</span> <span class="k">import</span> <span class="n">Variable</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="k">import</span> <span class="n">nn</span>
+<span class="kn">import</span> <span class="nn">torch.distributions</span> <span class="k">as</span> <span class="nn">ds</span>
+
+
+<span class="c1"># My models, optimizer classes - VAE, Adam</span>
+<span class="kn">import</span> <span class="nn">nldr.models</span>
+<span class="kn">from</span> <span class="nn">nldr.models</span> <span class="k">import</span> <span class="n">vae</span><span class="p">,</span> <span class="n">Encoder</span><span class="p">,</span> <span class="n">Decoder</span><span class="p">,</span> <span class="n">VAE</span>
+<span class="kn">from</span> <span class="nn">nldr.models</span> <span class="k">import</span> <span class="n">optimizers</span><span class="p">,</span> <span class="n">Optimizer</span>
+<span class="kn">import</span> <span class="nn">nldr.utils</span>
+<span class="kn">from</span> <span class="nn">nldr.utils.datasets</span> <span class="k">import</span> <span class="n">MNIST_Loader</span><span class="p">,</span> <span class="n">Visualize</span><span class="p">,</span> <span class="n">Caltech256</span><span class="p">,</span> <span class="n">Caltech256_Loader</span>
+
+<span class="c1"># Unrelated but useful</span>
+<span class="n">get_types</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span> <span class="p">:[(</span><span class="n">a</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">))</span> <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;_&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Something wrong with the caltech loader, fails when calling .iter() the
+second time..</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [62]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">258</span><span class="p">):</span>
+    <span class="n">cat_dirs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;256_ObjectCategories&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%03d</span><span class="s1">*&#39;</span> <span class="o">%</span> <span class="n">cat</span><span class="p">))</span>
+    <span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">cat_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+
+    <span class="n">split_1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.4</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">filenames</span><span class="p">))</span>
+    <span class="n">train_filenames</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[:</span><span class="n">split_1</span><span class="p">]</span>
+    <span class="n">test_filenames</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[</span><span class="n">split_1</span><span class="p">:]</span>
+
+    <span class="c1"># Create folders train and test</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;train&#39;</span><span class="p">))</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;test&#39;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">train_filenames</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">f</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;train&#39;</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">test_filenames</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">move</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">f</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cat_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s1">&#39;test&#39;</span><span class="p">))</span>
+
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [63]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Can always add this to the Loader class and abstract the loading aspect of it, leave here for now.</span>
+<span class="n">cal_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">64</span><span class="p">,</span><span class="mi">64</span><span class="p">)),</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+    <span class="c1">#transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])</span>
+<span class="p">])</span>
+<span class="n">cal_transform1</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+<span class="p">])</span>
+
+<span class="n">caltech_train</span> <span class="o">=</span> <span class="n">Caltech256</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span><span class="n">max_items</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">cal_transform</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [73]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">caltech_train</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[73]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Dataset Caltech256
+    Number of datapoints: 7680
+    Root Location: ./data
+    Transforms (if any): Compose(
+                             Resize(size=(64, 64), interpolation=PIL.Image.BILINEAR)
+                             RandomHorizontalFlip(p=0.5)
+                             ToTensor()
+                         )
+    Target Transforms (if any): None
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [64]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#plt.imshow(caltech_train[5][0][0])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[64]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.image.AxesImage at 0x7f308d6be8d0&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Caltech256_Autoencoder_5_1.png" src="../_images/notebooks_Caltech256_Autoencoder_5_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [65]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">caltech_test</span> <span class="o">=</span> <span class="n">Caltech256</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s1">&#39;./data&#39;</span><span class="p">,</span><span class="n">max_items</span> <span class="o">=</span> <span class="mi">40</span><span class="p">,</span> <span class="n">train</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">cal_transform</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [66]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">len</span><span class="p">(</span><span class="n">caltech_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[66]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>10240
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [67]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">caltech_X_train</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">caltech_Y_train</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="n">caltech_X_test</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">caltech_Y_test</span> <span class="o">=</span> <span class="p">[]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [68]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">item</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">caltech_train</span><span class="p">):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">caltech_X_train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="n">caltech_Y_train</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">item</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">caltech_test</span><span class="p">):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">caltech_X_test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="n">caltech_Y_test</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [69]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#SIFT Descriptor? What about the channels?</span>
+<span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">caltech_X_train</span><span class="p">)</span>
+<span class="n">Y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">caltech_Y_train</span><span class="p">)</span>
+
+<span class="n">X_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">caltech_X_test</span><span class="p">)</span>
+<span class="n">Y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">caltech_Y_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [70]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/caltech256_X_train&quot;</span><span class="o">+</span><span class="s2">&quot;.npy&quot;</span><span class="p">,</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/caltech256_Y_train&quot;</span><span class="o">+</span><span class="s2">&quot;.npy&quot;</span><span class="p">,</span><span class="n">Y_train</span><span class="p">)</span>
+
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/caltech256_X_test&quot;</span><span class="o">+</span><span class="s2">&quot;.npy&quot;</span><span class="p">,</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/caltech256_Y_test&quot;</span><span class="o">+</span><span class="s2">&quot;.npy&quot;</span><span class="p">,</span><span class="n">Y_test</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [90]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">caltech_train_loader</span> <span class="o">=</span> <span class="n">Caltech256_Loader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">caltech_train</span><span class="p">)</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">cal_iter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">caltech_train_loader</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [91]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">val</span> <span class="o">=</span> <span class="n">cal_iter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">images</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [95]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">caltech_train_loader</span><span class="o">.</span><span class="n">dataset</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[95]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Dataset Caltech256
+    Number of datapoints: 7680
+    Root Location: ./data
+    Transforms (if any): Compose(
+                             Resize(size=(64, 64), interpolation=PIL.Image.BILINEAR)
+                             RandomHorizontalFlip(p=0.5)
+                             ToTensor()
+                         )
+    Target Transforms (if any): None
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [84]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rand_image</span> <span class="o">=</span> <span class="n">Caltech256_Loader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">caltech_train</span><span class="p">)</span><span class="o">.</span><span class="n">random_image</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+<span class="c1"># Should be normalized?</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">rand_image</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[84]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.image.AxesImage at 0x7f308ca777b8&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Caltech256_Autoencoder_15_1.png" src="../_images/notebooks_Caltech256_Autoencoder_15_1.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">labels</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [96]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#train_loader, test_loader = MNIST_Loader(batch_size=64).load()</span>
+<span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span> <span class="o">=</span> <span class="n">MNIST_Loader</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Why am I not able to reload specific class without restarting kernel? Is it specifically because it&#39;s a class and not a method?</span>
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">nldr</span><span class="o">.</span><span class="n">utils</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">nldr</span><span class="o">.</span><span class="n">models</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [100]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># get some random training images</span>
+<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">dataiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [98]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rand_image</span> <span class="o">=</span> <span class="n">MNIST_Loader</span><span class="p">()</span><span class="o">.</span><span class="n">random_image</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Visualize</span><span class="o">.</span><span class="n">imshow_batch</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+<span class="c1">#Visualize.display_labels(classes,labels)</span>
+
+<span class="c1"># Visualize a random digit from a batch</span>
+<span class="c1">#Visualize.imshow_random(images)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="VAE-Encoder/Decoder-architecture">
+<h1>VAE Encoder/Decoder architecture<a class="headerlink" href="#VAE-Encoder/Decoder-architecture" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">D_in</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">D_out</span> <span class="o">=</span> <span class="mi">784</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">2</span>
+<span class="n">encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">D_in</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">D_out</span><span class="p">)</span>
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">D_out</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">D_in</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#model_vae = VAE().to(device) - if cuda is available, but not the case, yet</span>
+<span class="n">model_vae</span> <span class="o">=</span> <span class="n">VAE</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span><span class="n">decoder</span><span class="p">)</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">Optimizer</span><span class="p">(</span><span class="n">model_vae</span><span class="p">,</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model_vae</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">),</span><span class="n">early_stopping</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="c1">#optim.RMSprop(model_vae.parameters(), lr = 1e-3, momentum=0.9)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Generate 64 different digits. The sample is just the mean.</span>
+<span class="c1"># Turn on early stopping</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">train_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="n">train_loader</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">test_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="n">test_loader</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">D_out</span><span class="p">)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="n">model_vae</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
+        <span class="n">save_image</span><span class="p">(</span><span class="n">sample</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span>
+                   <span class="s1">&#39;MNIST_VAE_results/sample_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">early_stopping</span> <span class="ow">and</span> <span class="n">epoch</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">:</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">optimizer</span><span class="o">.</span><span class="n">average_loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">average_loss</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">thres</span> <span class="o">=</span> <span class="n">diff</span><span class="o">/</span><span class="n">optimizer</span><span class="o">.</span><span class="n">average_loss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">thres</span><span class="o">&lt;=</span> <span class="mf">0.3</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Performing early stopping .. &quot;</span><span class="p">)</span>
+            <span class="k">break</span><span class="p">;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Model-Evaluation">
+<h2>Model Evaluation<a class="headerlink" href="#Model-Evaluation" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+<div class="section" id="Optimizer-stats">
+<h1>Optimizer stats<a class="headerlink" href="#Optimizer-stats" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">optimizer</span><span class="o">.</span><span class="n">show_stats</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">save</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Save-Model-and-Gifs">
+<h1>Save Model and Gifs<a class="headerlink" href="#Save-Model-and-Gifs" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">model_vae</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="s2">&quot;data/saved&quot;</span> <span class="o">+</span> <span class="s1">&#39;/VAE_Adam_1e-4_30epochs.pkl&#39;</span><span class="p">)</span>
+<span class="c1"># ... after training, save your model</span>
+<span class="c1">#model.save_state_dict(&#39;mytraining.pt&#39;)</span>
+<span class="c1"># .. to load your previously training model:</span>
+<span class="c1">#model.load_state_dict(torch.load(&#39;mytraining.pt&#39;))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">image_gif</span> <span class="o">=</span> <span class="n">Visualize</span><span class="o">.</span><span class="n">make_gif</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Load-Model">
+<h1>Load Model<a class="headerlink" href="#Load-Model" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Model</span> <span class="n">needs</span> <span class="n">to</span> <span class="n">exist</span> <span class="n">first</span>
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">model_original</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="o">=</span><span class="s2">&quot;data/saved&quot;</span> <span class="o">+</span> <span class="s1">&#39;/VAE_Adam_1e-4_30epochs.pkl&#39;</span><span class="p">)</span>
+<span class="n">model_vae_original</span> <span class="o">=</span> <span class="n">VAE</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span><span class="n">decoder</span><span class="p">)</span>
+<span class="n">model_vae_original</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">model_original</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Plot-the-latent-space">
+<h1>Plot the latent space<a class="headerlink" href="#Plot-the-latent-space" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">First</span> <span class="n">change</span> <span class="n">the</span> <span class="n">number</span> <span class="n">of</span> <span class="n">points</span> <span class="n">you</span> <span class="n">plot</span> <span class="n">by</span> <span class="n">selecting</span> <span class="mi">10000</span>
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">train_loader</span><span class="p">,</span> <span class="n">test_loader</span> <span class="o">=</span> <span class="n">MNIST_Loader</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">train_loader</span><span class="p">)</span>
+<span class="n">images</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">dataiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+
+<span class="c1"># Feed a new batch of images and get the mean and logvar of the latent space.</span>
+<span class="c1"># This gives you the parameters of the Gaussian</span>
+<span class="n">mu</span><span class="p">,</span> <span class="n">logvar</span> <span class="o">=</span> <span class="n">model_vae</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">images</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">784</span><span class="p">))</span>
+<span class="n">Visualize</span><span class="o">.</span><span class="n">plot_latent_space</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+<span class="c1"># 2. Visualize the prior predictive distribution. Fix the latent variables between [-3,3]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Plot-the-manifold">
+<h1>Plot the manifold<a class="headerlink" href="#Plot-the-manifold" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span> <span class="n">Generate</span> <span class="n">the</span> <span class="mi">2</span> <span class="n">dimensions</span> <span class="n">by</span> <span class="n">encoding</span> <span class="n">a</span> <span class="n">digit</span> <span class="n">of</span> <span class="n">your</span> <span class="n">choice</span><span class="p">,</span> <span class="n">then</span> <span class="n">perturb</span> <span class="n">the</span> <span class="n">reconstruction</span> <span class="k">with</span> <span class="n">linspace</span>
+<span class="o">*</span> <span class="n">Plot</span> <span class="n">the</span> <span class="mi">2</span> <span class="n">latent</span> <span class="n">dimensions</span><span class="o">/</span><span class="n">means</span> <span class="ow">in</span> <span class="n">space</span> <span class="k">with</span> <span class="n">the</span> <span class="n">associated</span> <span class="n">digits</span> <span class="n">they</span> <span class="n">produce</span>
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">no_digit</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">no_digit</span><span class="p">]</span>
+<span class="n">label</span> <span class="o">=</span> <span class="n">labels</span><span class="p">[</span><span class="n">no_digit</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Visualize</span><span class="o">.</span><span class="n">plot_manifold</span><span class="p">(</span><span class="n">model_vae</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+<span class="c1"># Proof it&#39;s random but not entirely, when you generate</span>
+<span class="c1">#Visualize.imshow_batch(res.view(-1,28,28).data)</span>
+<span class="c1">#Visualize.imshow_batch(res1.view(-1,28,28).data)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># This is an example that aims to further reduce the latent space.</span>
+<span class="n">latent_data</span> <span class="o">=</span> <span class="n">LatentSpaceDataset</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">mini_train_loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">latent_data</span><span class="p">,</span> <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1">#mini_data_iter = iter(mini_train_loader)</span>
+<span class="c1">#datapoint, label = mini_data_iter.next()</span>
+<span class="n">D_in_latent</span><span class="p">,</span> <span class="n">H_latent</span><span class="p">,</span> <span class="n">D_out_latent</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">2</span>
+<span class="n">encoder1</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">D_in_latent</span><span class="p">,</span> <span class="n">H_latent</span><span class="p">,</span> <span class="n">D_out_latent</span><span class="p">)</span>
+<span class="n">decoder1</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">D_out_latent</span><span class="p">,</span> <span class="n">H_latent</span><span class="p">,</span> <span class="n">D_in_latent</span><span class="p">)</span>
+
+<span class="c1">#model_vae = VAE().to(device) - if cuda is available, but not the case, yet</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">VAE</span><span class="p">(</span><span class="n">encoder1</span><span class="p">,</span><span class="n">decoder1</span><span class="p">)</span>
+<span class="n">optimizer1</span> <span class="o">=</span> <span class="n">Optimizer</span><span class="p">(</span><span class="n">model</span><span class="p">,</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">))</span>
+
+<span class="c1"># Generate 64 different digits. The sample is just the mean.</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">15</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="n">optimizer1</span><span class="o">.</span><span class="n">train_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span><span class="n">mini_train_loader</span><span class="p">)</span>
+    <span class="c1">#optimizer1.test_epoch(epoch,test_loader)</span>
+
+<span class="n">mu_latent</span><span class="p">,</span> <span class="n">logvar_latent</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">mu</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">20</span><span class="p">))</span>
+<span class="n">plot_latent_space</span><span class="p">(</span><span class="n">mu_latent</span><span class="p">,</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Patric Fulop.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'58876c6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

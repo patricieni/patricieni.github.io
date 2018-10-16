@@ -1,0 +1,344 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mml.datasets &mdash; Metric Learning version 58876c6</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Metric Learning version 58876c6" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index_ot.html" class="icon icon-home"> Metric Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Multiscale Metric Learning-GPU.html">Multiscale Metric Learning - GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Multiscale Metric Learning.html">Multiscale Metric Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MML Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mml/mml.html">mml package</a></li>
+</ul>
+<p class="caption"><span class="caption-text">TODO List</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/TODO.html">TODO List</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index_ot.html">Metric Learning</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index_ot.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>mml.datasets</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mml.datasets</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="k">import</span> <span class="n">load_digits</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">check_X_y</span><span class="p">,</span> <span class="n">check_array</span>
+<span class="kn">import</span> <span class="nn">os</span> 
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span> 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1">#### PACKAGE for loading various datasets in the correct and desired format for MML ###### </span>
+<span class="c1">#### -------------------------------------------------------------------------------######</span>
+
+<div class="viewcode-block" id="load_caltech"><a class="viewcode-back" href="../../mml/mml.html#mml.datasets.load_caltech">[docs]</a><span class="k">def</span> <span class="nf">load_caltech</span><span class="p">(</span><span class="nb">repr</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to load Caltech256 - without downloading</span>
+<span class="sd">    Bare in mind Y is no longer an array with numbers, it has objects and strings in it..</span>
+<span class="sd">    Need some sort of dictionary again</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repr (string): What representation of the objects to load, i.e. Hellinger</span>
+<span class="sd">        path (string): Path to where the files reside. </span>
+<span class="sd">        download (boolean): Defaults to False</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        X,Y (np.array): pairs in the correct representation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">X_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;caltech256_X_test.npy&quot;</span><span class="p">)</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span><span class="s2">&quot;caltech256_X_train.npy&quot;</span><span class="p">)</span>
+
+    <span class="n">Y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span><span class="s2">&quot;caltech256_Y_train.npy&quot;</span><span class="p">)</span>
+    <span class="n">Y_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span><span class="s2">&quot;caltech256_Y_test.npy&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">repr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;hellinger&quot;</span><span class="p">:</span>
+        <span class="n">X_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+        <span class="n">X_test</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="load_mnist"><a class="viewcode-back" href="../../mml/mml.html#mml.datasets.load_mnist">[docs]</a><span class="k">def</span> <span class="nf">load_mnist</span><span class="p">(</span><span class="nb">repr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to load MNIST - SIFT data in the desired representation </span>
+<span class="sd">    Right now you can load normal data or Hellinger representation</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        repr (string): Name of representation you want for MNIST training points</span>
+
+<span class="sd">    Returns: </span>
+<span class="sd">        X, Y pair in the correct representation    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">digits</span> <span class="o">=</span> <span class="n">load_digits</span><span class="p">()</span> 
+    <span class="k">if</span> <span class="nb">repr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;hellinger&quot;</span><span class="p">:</span>
+        <span class="c1"># Hellinger representation is sqrt of the data</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">digits</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">X</span> <span class="o">=</span> <span class="n">digits</span><span class="o">.</span><span class="n">data</span>    
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">digits</span><span class="o">.</span><span class="n">target</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span><span class="n">Y</span></div>
+
+<span class="c1"># Returns datasets that contain only 2 objects per dataset in terms of labels </span>
+<div class="viewcode-block" id="dictionary"><a class="viewcode-back" href="../../mml/mml.html#mml.datasets.dictionary">[docs]</a><span class="k">def</span> <span class="nf">dictionary</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns a dictionary where the key is the label or digit and the value </span>
+<span class="sd">    is an array of all training points associated to that digit</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        X (array): Training points </span>
+<span class="sd">        Y (array): Labels</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Each entry key will be associated to a label and the values will be all training points for that key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+            
+    <span class="c1"># Concatenate all and reshape to get array in the form of the initial data</span>
+    <span class="c1"># eg: all_digits[0].shape will return (151,64) which means 151 training points with label 0</span>
+    <span class="n">all_digits</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">all_digits</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">],</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]),</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">all_digits</span></div>
+
+
+<div class="viewcode-block" id="data_pairs"><a class="viewcode-back" href="../../mml/mml.html#mml.datasets.data_pairs">[docs]</a><span class="k">def</span> <span class="nf">data_pairs</span><span class="p">(</span><span class="n">all_digits</span><span class="p">,</span> <span class="n">key1</span><span class="p">,</span> <span class="n">key2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Specify which binary classification you want and return a dataset accordingly.</span>
+<span class="sd">    Input a dictionary of all digits instances for all classes, key corresponds to class label. </span>
+<span class="sd">    We make the assumption that digits have the correct labels. This is a true statement correct? When thinking about MNIST</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        all_digits (dict): dictionary of key: digit value: training data for key</span>
+<span class="sd">        key1 (int): digit you want to classify</span>
+<span class="sd">        key2 (int): digit you want to classify</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        [array,array]: a list of the training data with its associated labels</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">x_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">all_digits</span><span class="p">[</span><span class="n">key1</span><span class="p">],</span><span class="n">all_digits</span><span class="p">[</span><span class="n">key2</span><span class="p">]))</span>
+    
+    <span class="n">y_res1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">key1</span><span class="p">,</span><span class="n">all_digits</span><span class="p">[</span><span class="n">key1</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">y_res2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">key2</span><span class="p">,</span><span class="n">all_digits</span><span class="p">[</span><span class="n">key2</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">y_res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">y_res1</span><span class="p">,</span><span class="n">y_res2</span><span class="p">))</span>
+    
+    <span class="k">return</span> <span class="p">[</span><span class="n">x_res</span><span class="p">,</span><span class="n">y_res</span><span class="p">]</span></div>
+
+    <span class="c1"># Most likely what train test split does under the hood - good to know </span>
+    <span class="c1">#idx = np.random.permutation(len(x_12))</span>
+    <span class="c1">#x,y = x_12[idx], y_12[idx]</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Patric Fulop.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'58876c6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

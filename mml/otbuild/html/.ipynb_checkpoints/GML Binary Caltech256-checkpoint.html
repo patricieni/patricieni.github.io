@@ -1,0 +1,753 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Binary Ground Metric Learning on Caltech 256 &mdash; Metric Learning version 58876c6</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Metric Learning version 58876c6" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index_ot.html" class="icon icon-home"> Metric Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning-GPU.html">Multiscale Metric Learning - GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning.html">Multiscale Metric Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MML Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mml/mml.html">mml package</a></li>
+</ul>
+<p class="caption"><span class="caption-text">TODO List</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../doc/TODO.html">TODO List</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index_ot.html">Metric Learning</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index_ot.html">Docs</a> &raquo;</li>
+        
+      <li>Binary Ground Metric Learning on Caltech 256</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/.ipynb_checkpoints/GML Binary Caltech256-checkpoint.ipynb" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="Binary-Ground-Metric-Learning-on-Caltech-256">
+<h1>Binary Ground Metric Learning on Caltech 256<a class="headerlink" href="#Binary-Ground-Metric-Learning-on-Caltech-256" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="Usage">
+<h2>Usage<a class="headerlink" href="#Usage" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>mml.gml - Wasserstein distances</li>
+<li>mml.gml - OT matrices</li>
+<li>mml.gml - Similarity matrix</li>
+<li>mml.datasets - Datasets loading, CALTECH256 is different than MNIST,
+preprocessing is done via PyTorch</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="c1">#import warnings</span>
+<span class="c1">#warnings.filterwarnings(&quot;ignore&quot;)</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm_notebook</span> <span class="k">as</span> <span class="n">tqdm_notebook</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">trange</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Your code goes here</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">testing</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">adjusted_rand_score</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">Normalizer</span>
+
+<span class="kn">import</span> <span class="nn">metric_learn</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">classification_report</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">NearestNeighbors</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">DistanceMetric</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors.ball_tree</span> <span class="k">import</span> <span class="n">BallTree</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">log_loss</span>
+
+<span class="c1"># Shogun - Metric Learning</span>
+<span class="kn">from</span> <span class="nn">shogun</span> <span class="k">import</span> <span class="n">LMNN</span> <span class="k">as</span> <span class="n">shogun_LMNN</span>
+<span class="kn">from</span> <span class="nn">shogun</span> <span class="k">import</span> <span class="n">RealFeatures</span><span class="p">,</span> <span class="n">MulticlassLabels</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">check_X_y</span><span class="p">,</span> <span class="n">check_array</span>
+
+<span class="c1"># POT imports</span>
+<span class="kn">import</span> <span class="nn">ot</span>
+<span class="kn">from</span> <span class="nn">ot.datasets</span> <span class="k">import</span> <span class="n">get_1D_gauss</span> <span class="k">as</span> <span class="n">gauss</span>
+
+<span class="c1"># MML import</span>
+<span class="kn">from</span> <span class="nn">mml</span> <span class="k">import</span> <span class="n">wasserstein</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">gml</span><span class="p">,</span> <span class="n">ot_testing</span><span class="p">,</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">helper</span>
+
+<span class="n">data_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;/data/&quot;</span>
+<span class="n">results_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;/results/binary&quot;</span>
+
+<span class="k">def</span> <span class="nf">write_to_pickle</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="n">dataframe</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">data_path</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.pickle&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">read_from_pickle</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">data_path</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.pickle&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">wasserstein</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">gml</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">helper</span><span class="p">)</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Select-from-labels-pairs-of-datapoints-to-construct-multiple-training-sets-for-GML">
+<h2>Select from labels pairs of datapoints to construct multiple training sets for GML<a class="headerlink" href="#Select-from-labels-pairs-of-datapoints-to-construct-multiple-training-sets-for-GML" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="Currently-the-loading-of-Caltech-data-is-done-via-preprocessed-data-through-Pytorch">
+<h3>Currently the loading of Caltech data is done via preprocessed data through Pytorch<a class="headerlink" href="#Currently-the-loading-of-Caltech-data-is-done-via-preprocessed-data-through-Pytorch" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">X_train</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_caltech</span><span class="p">(</span><span class="s2">&quot;Hellinger&quot;</span><span class="p">,</span><span class="n">data_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">X_train</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">64</span><span class="p">));</span>
+<span class="c1"># A GUN</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/.ipynb_checkpoints_GML_Binary_Caltech256-checkpoint_6_0.png" src="../_images/.ipynb_checkpoints_GML_Binary_Caltech256-checkpoint_6_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1">#np.bincount(Y_train)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">data_dict</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">dictionary</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">Y_train</span><span class="p">)</span>
+<span class="n">test_data_dict</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">dictionary</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span><span class="n">Y_test</span><span class="p">)</span>
+
+<span class="n">class1</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">class2</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="c1"># We&#39;ll have a lot of combinations, pick class 1 and 2.</span>
+<span class="p">[</span><span class="n">x12</span><span class="p">,</span><span class="n">y12</span><span class="p">]</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">data_pairs</span><span class="p">(</span><span class="n">data_dict</span><span class="p">,</span><span class="n">class1</span><span class="p">,</span><span class="n">class2</span><span class="p">)</span>
+<span class="p">[</span><span class="n">x12_test</span><span class="p">,</span><span class="n">y12_test</span><span class="p">]</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">data_pairs</span><span class="p">(</span><span class="n">test_data_dict</span><span class="p">,</span><span class="n">class1</span><span class="p">,</span><span class="n">class2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Transform into histogram</span>
+<span class="c1"># Neither Wasserstein POT nor LMNN are normalized, have to do it yourself</span>
+<span class="c1"># Below is the CORRECT way to normalize</span>
+
+<span class="n">row_sum_x12</span> <span class="o">=</span> <span class="n">x12</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">row_sum_x12_test</span> <span class="o">=</span> <span class="n">x12_test</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">X_train_normalized</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">x12</span><span class="p">,</span><span class="n">row_sum_x12</span><span class="p">[:,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span>
+<span class="n">X_test_normalized</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">true_divide</span><span class="p">(</span><span class="n">x12_test</span><span class="p">,</span><span class="n">row_sum_x12_test</span><span class="p">[:,</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># These are independent of what data we choose, only on the dimensionality of a datapoint, i.e. here is 64</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="c1"># By default metric =&#39;sqeuclidean&#39; in the function</span>
+<span class="n">M_sqeuclidean</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">metric</span><span class="o">=</span><span class="s1">&#39;sqeuclidean&#39;</span><span class="p">)</span>
+<span class="n">M_eye</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">metric</span><span class="o">=</span><span class="s1">&#39;hamming&#39;</span><span class="p">)</span>
+
+<span class="n">xx</span><span class="p">,</span><span class="n">yy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">64</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">64</span><span class="p">))</span>
+<span class="n">xy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">xx</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">yy</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+<span class="n">M_mesh</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">xy</span><span class="p">,</span> <span class="n">xy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">M_sqeuclidean</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/.ipynb_checkpoints_GML_Binary_Caltech256-checkpoint_11_0.png" src="../_images/.ipynb_checkpoints_GML_Binary_Caltech256-checkpoint_11_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Plot metric with all ones except diagonal, which is zero</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">M_mesh</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/.ipynb_checkpoints_GML_Binary_Caltech256-checkpoint_12_0.png" src="../_images/.ipynb_checkpoints_GML_Binary_Caltech256-checkpoint_12_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="GML-M^*-and-W_d-via-Cuturi">
+<h2>GML <span class="math notranslate nohighlight">\(M^*\)</span> and <span class="math notranslate nohighlight">\(W_d\)</span> via Cuturi<a class="headerlink" href="#GML-M^*-and-W_d-via-Cuturi" title="Permalink to this headline">¶</a></h2>
+<p>Questions to answer - are digits normalized? no, we need to perform
+that. does POT do the normalization step itself? NO, we need to do it
+ourselves - We need to build <span class="math notranslate nohighlight">\(M_1\)</span>, the initial distance between
+digits for our algorithm. Follow the algo for doing this. - Try
+Wasserstein with Euclidean distance so that you have an idea of the
+accuracy. Errors are important too though. - Randomize the whole
+training so you can get some error bars. Step 1: Find
+<span class="math notranslate nohighlight">\(D(digit1,digit2)\)</span> as Euclidean and an input to the Wasserstein
+algorithm. Step 2: Have a way of computing <span class="math notranslate nohighlight">\(X^*\)</span> for two digits.
+This is the OT distance. (have another one using Sinkhorn) Step 3: 1)M
+and 2)X will be 64x64 matrices with each entry comparing points in
+1)data space 2) probability space</p>
+<p>Learning ground metrics. - Where does the similarity matrix come from?
+i.e.&nbsp;for us it’s multiclass. Build <span class="math notranslate nohighlight">\(w_ij\)</span> for similar histograms
+using 1/nk - For the feasible set of ground metrics, M has to have L1
+norm of 1. - Find <span class="math notranslate nohighlight">\(W(r_i,r_j)\)</span> such that it’s small for similar
+images, and big for dissimilar images. Problem is all dissimilarities
+are on the same page - which is not entirely true. Can we do better if
+we engineer that? - Remember, Wasserstein-2 is
+<span class="math notranslate nohighlight">\(G_i,j(M) = &lt;X^*,M&gt;\)</span> and gradient of that is <span class="math notranslate nohighlight">\(X^*\)</span>. You need
+to use these. - M is only one. that doesn’t sound right… - How do you
+compute the similar/dissimilar neighbours. You need to keep track of
+1437x1437 wasserstein distances. Then you need to find the k closest
+neighbours. Or maybe half of that. Each line has all neighbours of the
+first position in the line. But what about when i=4 and you’re only
+looking at j &gt; 4</p>
+<p><strong>Build similarity matrix:</strong> * k_neigh = 3 * Can you build <span class="math notranslate nohighlight">\(w\)</span>
+differently, i.e.&nbsp;by encoding some prior information that tells you how
+close r_i and r_j are?</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">k_neigh</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">similarity_matrix</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span><span class="n">Y_train</span><span class="p">,</span><span class="n">k_neigh</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">w</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/.ipynb_checkpoints_GML_Binary_Caltech256-checkpoint_15_0.png" src="../_images/.ipynb_checkpoints_GML_Binary_Caltech256-checkpoint_15_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">experiment</span> <span class="o">=</span> <span class="s2">&quot;caltech_12&quot;</span>
+<span class="n">LOG_FILENAME</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())),</span><span class="s1">&#39;tmp/&#39;</span><span class="o">+</span> <span class="n">experiment</span> <span class="o">+</span> <span class="s2">&quot;.log&quot;</span><span class="p">)</span>
+<span class="c1">#logger = logging.getLogger(__name__)</span>
+<span class="n">gml_logger</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">setup_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">,</span><span class="n">LOG_FILENAME</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">M_learned</span><span class="p">,</span> <span class="n">objective_tracker</span><span class="p">,</span> <span class="n">product_tracker</span><span class="p">,</span> <span class="n">interval_tracker</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">projected_subgradient</span><span class="p">(</span>
+                                                  <span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">M_mesh</span> <span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="s2">&quot;matrix_caltech_12&quot;</span><span class="p">,</span><span class="n">logger</span><span class="o">=</span><span class="n">gml_logger</span><span class="p">,</span> <span class="n">p_max</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span> <span class="n">q_max</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span> <span class="n">early_stopping</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span><span class="n">experiment</span><span class="o">=</span><span class="n">experiment</span><span class="p">)</span>
+<span class="c1">#M_learned, product_tracker, objective_tracker, interval_tracker, change_M, z_results, gamma, outer_M = projected_subgradient(</span>
+                                                    <span class="c1">#X_train_normalized,M_original_eye,w,p_max = 3,q_max =40)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">M_learned</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">helper</span><span class="o">.</span><span class="n">save_ndarray</span><span class="p">(</span><span class="s2">&quot;results/binary/caltech/gml12_mesh_vectorized&quot;</span><span class="p">,</span><span class="n">M_learned</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Patric Fulop.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'58876c6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,729 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mml.gml &mdash; Metric Learning version 58876c6</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="Metric Learning version 58876c6" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index_ot.html" class="icon icon-home"> Metric Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Multiscale Metric Learning-GPU.html">Multiscale Metric Learning - GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Multiscale Metric Learning.html">Multiscale Metric Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MML Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../mml/mml.html">mml package</a></li>
+</ul>
+<p class="caption"><span class="caption-text">TODO List</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../doc/TODO.html">TODO List</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index_ot.html">Metric Learning</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index_ot.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>mml.gml</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mml.gml</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">scp</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="k">as</span> <span class="nn">pyl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">Normalizer</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">tqdm</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="k">import</span> <span class="n">tqdm_notebook</span> <span class="k">as</span> <span class="n">tqdm_notebook</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+
+<span class="c1">#logging.info(&quot;This is the logger for GML metric learning&quot;)</span>
+
+<span class="kn">import</span> <span class="nn">ot</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">helper</span> 
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">wasserstein</span>
+
+<span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1">,</span><span class="si">%(msecs)d</span><span class="s1"> </span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1"> </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="setup_logger"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.setup_logger">[docs]</a><span class="k">def</span> <span class="nf">setup_logger</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">log_file</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function setup as many loggers as you want&quot;&quot;&quot;</span>
+
+    <span class="n">handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">log_file</span><span class="p">)</span>        
+    <span class="n">handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">level</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">logger</span></div>
+
+
+<span class="c1">######-------------------- CUTURI&#39;s Algorithms ----------------------#######</span>
+<span class="c1">######---------------------------------------------------------------#######</span>
+    
+<span class="c1">##########------------------- ALGORITHM 1----------------------#######</span>
+
+<div class="viewcode-block" id="algorithm1_similar"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.algorithm1_similar">[docs]</a><span class="k">def</span> <span class="nf">algorithm1_similar</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">G_all</span><span class="p">,</span> <span class="n">T_all</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Algorithm 1 from Cuturi GML for the similar neighbours</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        M (matrix): Ground metric</span>
+<span class="sd">        w (matrix): Similarity Matrix</span>
+<span class="sd">        G_all (matrix): All Wasserstein distances</span>
+<span class="sd">        T_all (tensor): All coupling matrices</span>
+<span class="sd">        k (int, optional): Defaults to 3. Neighbours to consider</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        z_plus, gamma_plus: The weighted sum for similar components for the minimization criteria (z) and the gradients (gamma)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="c1"># Select the k smallest similar/dissimilar neighbours for each histogram i and the elements that come with it, i.e. w, G and X*, i.e. Wasserstein distance</span>
+    <span class="n">S_similar</span> <span class="o">=</span> <span class="n">similar_neighbours</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">G_all</span><span class="p">)</span>
+    <span class="n">grad_similar</span> <span class="o">=</span> <span class="n">gradient_neighbours</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">T_all</span><span class="p">,</span> <span class="n">S_similar</span><span class="p">)</span>
+    
+    <span class="c1">#print(&quot;All done with selecting neighbours and gradients&quot;) </span>
+    
+    <span class="c1"># Compute sum for each individual histogram and return a list of sums </span>
+    <span class="n">similar_sum</span> <span class="o">=</span> <span class="n">sum_neighbours</span><span class="p">(</span><span class="n">S_similar</span><span class="p">)</span>
+    <span class="n">grad_similar_sum</span> <span class="o">=</span> <span class="n">sum_gradients</span><span class="p">(</span><span class="n">grad</span><span class="o">=</span><span class="n">grad_similar</span><span class="p">)</span>
+    
+    <span class="c1">#print(&quot;Sum all histogram information&quot;)</span>
+    <span class="c1"># Rename them as in GML for clarity and sum the objective and gradients across all histograms for similar/dissimilar pairs (sum the lists)</span>
+    <span class="n">z_plus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">similar_sum</span><span class="p">)</span>
+    <span class="n">gamma_plus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_similar_sum</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Return a (d 2) vector </span>
+    <span class="n">gamma_plus</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">triu_vector</span><span class="p">(</span><span class="n">gamma_plus</span><span class="p">)</span> <span class="o">+</span> <span class="n">helper</span><span class="o">.</span><span class="n">tril_vector</span><span class="p">(</span><span class="n">gamma_plus</span><span class="p">)</span>
+    
+    <span class="c1"># Return a semi-metric matrix with zero on the diagonal</span>
+    <span class="c1">#gamma_plus = helper.triu(gamma_plus) + helper.tril(gamma_plus)</span>
+
+    
+    <span class="k">return</span> <span class="n">z_plus</span><span class="p">,</span> <span class="n">gamma_plus</span>   </div>
+
+
+<div class="viewcode-block" id="algorithm1_dissimilar"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.algorithm1_dissimilar">[docs]</a><span class="k">def</span> <span class="nf">algorithm1_dissimilar</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">G_all</span><span class="p">,</span> <span class="n">T_all</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Algorithm 1 from Cuturi GML for dissimilar neighbours</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        M (matrix): Ground metric</span>
+<span class="sd">        w (matrix): Similarity Matrix</span>
+<span class="sd">        G_all (matrix): All Wasserstein distances</span>
+<span class="sd">        T_all (tensor): All coupling matrices</span>
+<span class="sd">        k (int, optional): Defaults to 3. Neighbours to consider</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        z_plus, gamma_plus: The weighted sum for dissimilar components for the minimization criteria (z) and the gradients (gamma)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Select the k smallest similar/dissimilar neighbours for each histogram i and the elements that come with it, i.e. w, G and X*, i.e. Wasserstein distance</span>
+    <span class="n">S_dissimilar</span> <span class="o">=</span> <span class="n">dissimilar_neighbours</span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">G_all</span><span class="p">)</span>
+    <span class="n">grad_dissimilar</span> <span class="o">=</span> <span class="n">gradient_neighbours</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">T_all</span><span class="p">,</span> <span class="n">S_dissimilar</span><span class="p">)</span>
+    
+    <span class="c1">#print(&quot;All done with selecting neighbours and gradients&quot;)</span>
+    
+    <span class="c1"># Compute sum for each individual histogram and return a list of sums </span>
+    <span class="n">dissimilar_sum</span> <span class="o">=</span> <span class="n">sum_neighbours</span><span class="p">(</span><span class="n">S_dissimilar</span><span class="p">)</span>
+    <span class="n">grad_dissimilar_sum</span> <span class="o">=</span> <span class="n">sum_gradients</span><span class="p">(</span><span class="n">grad</span><span class="o">=</span><span class="n">grad_dissimilar</span><span class="p">)</span>
+    
+    <span class="c1">#print(&quot;Sum all histogram information&quot;)</span>
+    <span class="c1"># Rename them as in GML for clarity and sum the objective and gradients across all histograms for similar/dissimilar pairs (sum the lists)</span>
+    <span class="n">z_minus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dissimilar_sum</span><span class="p">)</span>
+    <span class="n">gamma_minus</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_dissimilar_sum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Return a (d 2) vector </span>
+    <span class="n">gamma_minus</span> <span class="o">=</span>  <span class="n">helper</span><span class="o">.</span><span class="n">triu_vector</span><span class="p">(</span><span class="n">gamma_minus</span><span class="p">)</span> <span class="o">+</span> <span class="n">helper</span><span class="o">.</span><span class="n">tril_vector</span><span class="p">(</span><span class="n">gamma_minus</span><span class="p">)</span>
+
+    <span class="c1"># Return a semi-metric matrix with zero on the diagonal</span>
+    <span class="c1">#gamma_minus = helper.triu(gamma_minus)+ helper.tril(gamma_minus)</span>
+    
+    <span class="k">return</span> <span class="n">z_minus</span><span class="p">,</span> <span class="n">gamma_minus</span>    </div>
+
+
+<span class="c1">##########------------------- IMPORTANT ALGORITHM 2----------------------#######</span>
+
+
+<div class="viewcode-block" id="projected_subgradient"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.projected_subgradient">[docs]</a><span class="k">def</span> <span class="nf">projected_subgradient</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">q_max</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">p_max</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">early_stopping</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">progress_bar</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span><span class="n">experiment</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This is the projected subgradient descent that is Algorithm 2 of Cuturi GML paper</span>
+<span class="sd">    TODO - Enter the best M_initial using Algorithm 3</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        X_train_normalized (array): Normalized dataset </span>
+<span class="sd">        M (array): Initial ground metric for our algorithm</span>
+<span class="sd">        w (array): Similarity matrix</span>
+<span class="sd">        f (str): Name of matrix file for projection code</span>
+<span class="sd">        logger (str): Logger Handler</span>
+<span class="sd">        q_max (int): Inner Loop max interations</span>
+<span class="sd">        p_max (int): Outer Loop max iterations</span>
+<span class="sd">        early_stopping (bool): Boolean Value for inner loop </span>
+<span class="sd">        progress_bar (bool): Boolean value for notebook run</span>
+<span class="sd">        experiment (str): String value for experiment name</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        array, list: The learned ground metric and a list that tracks the objective criteria</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Input M_0 as some matrix </span>
+    <span class="c1"># q_max is set to 80 and the inner loop is run at minimum 24 times unless</span>
+    <span class="c1"># z_threshold doesn&#39;t change more than 0.75% in 8 iterations</span>
+    <span class="c1"># I need to do this and plot the learning for z_plus and z_threshold. </span>
+    <span class="c1"># First do z_threshold (or z_in)</span>
+    <span class="c1"># A maximum of 20 outer loops - so p_max = 20</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X_train_normalized</span>
+    <span class="c1"># M_0 = total_variation()</span>
+    <span class="c1"># I don&#39;t see how this changes the problem, the G&#39;s will be indepedent of scaling</span>
+    <span class="n">M_0</span> <span class="o">=</span> <span class="n">M</span><span class="o">/</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="mi">1</span> 
+    <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">M_p_outer</span> <span class="o">=</span> <span class="n">M_0</span>    
+
+    <span class="n">q_min</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="n">interval</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="c1">#with tqdm.tqdm(total=p_max) as outer_progress_bar:</span>
+    <span class="c1">#outer_progress_bar.set_description(&quot;Outer Loop Progress&quot;)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Running from notebook: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">progress_bar</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Running for </span><span class="si">{0}</span><span class="s2"> </span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">experiment</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>
+        <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm_notebook</span><span class="p">(</span><span class="n">total</span> <span class="o">=</span> <span class="n">p_max</span><span class="p">)</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Outer Loop progress&quot;</span><span class="p">)</span>
+            
+    <span class="n">objective_tracker</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">product_tracker</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">interval_tracker</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">while</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="n">p_max</span><span class="p">:</span> 
+        <span class="c1">#print(&quot;Outer Loop: Iteration {0}&quot;.format(p))</span>
+        <span class="n">G</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">compute_distances</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">M_p_outer</span><span class="p">,</span><span class="n">showProgress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">z_plus</span><span class="p">,</span> <span class="n">gamma_plus</span> <span class="o">=</span> <span class="n">algorithm1_similar</span><span class="p">(</span><span class="n">M_p_outer</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span> 
+        <span class="n">M_q_inner</span> <span class="o">=</span> <span class="n">M_p_outer</span>
+        
+        <span class="c1">#with tqdm.tqdm(total=q_max) as inner_progress_bar:</span>
+        <span class="c1">#inner_progress_bar.set_description(&quot;Inner Loop Progress&quot;)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;At iteration </span><span class="si">{0}</span><span class="s2"> in outer loop&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span> 
+            <span class="n">qbar</span> <span class="o">=</span> <span class="n">tqdm_notebook</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">q_max</span><span class="p">)</span>
+            <span class="n">qbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Inner Loop progress&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">q</span> <span class="o">&lt;</span> <span class="n">q_max</span><span class="p">:</span>
+            <span class="c1">#print(&quot;Inner Loop: Iteration {0}&quot;.format(q))</span>
+            <span class="n">G</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">compute_distances</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">M_q_inner</span><span class="p">,</span><span class="n">showProgress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">z_minus</span><span class="p">,</span> <span class="n">gamma_minus</span> <span class="o">=</span> <span class="n">algorithm1_dissimilar</span><span class="p">(</span><span class="n">M_q_inner</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+
+            <span class="c1"># The following line should be a pure number, the criteria/error where optimizing</span>
+            <span class="c1"># Please make sure the res value is correctly computed, as the algo doesn&#39;t say much. </span>
+            <span class="c1"># you should deduce from the paper whether it&#39;s a scalar or not, although it should be. </span>
+            <span class="c1"># Maybe the transpose was his way of saying this is a sum...</span>
+            <span class="c1"># Maybe you don&#39;t actually have to do any transpose for gamma plus ...</span>
+            
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">tril_vector</span><span class="p">(</span><span class="n">M_q_inner</span><span class="p">)</span> <span class="o">-</span> <span class="n">helper</span><span class="o">.</span><span class="n">tril_vector</span><span class="p">(</span><span class="n">M_p_outer</span><span class="p">)</span>
+            <span class="c1">#diff = M_q_inner - M_p_outer</span>
+            
+            
+            <span class="c1">#prod =  np.trace(np.transpose(gamma_plus).dot(diff))</span>
+            <span class="n">prod</span> <span class="o">=</span> <span class="n">gamma_plus</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+
+            <span class="n">z_in</span> <span class="o">=</span> <span class="n">z_minus</span> <span class="o">+</span> <span class="n">z_plus</span> <span class="o">+</span> <span class="n">prod</span>
+            
+            <span class="c1"># Track the learning</span>
+            <span class="n">product_tracker</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prod</span><span class="p">)</span>
+            <span class="n">objective_tracker</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_in</span><span class="p">)</span>
+             
+          <span class="c1"># Log objective every 5 inner iterations</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">q</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Doing metric projection at iteration </span><span class="si">{0}</span><span class="s2"> in inner loop&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Objective value is </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">z_in</span><span class="p">))</span>
+
+
+            <span class="c1"># Gradient descent </span>
+            <span class="c1">#M_q_inner = M_q_inner - learning_rate/np.sqrt(q+1) * (gamma_plus + gamma_minus)</span>
+            <span class="n">M_q_inner_lower</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">tril_vector</span><span class="p">(</span><span class="n">M_q_inner</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">learning_rate</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">gamma_plus</span> <span class="o">+</span> <span class="n">gamma_minus</span><span class="p">))</span>
+            
+            <span class="c1"># Because the output of the algorithm might not be a metric, </span>
+            <span class="c1"># use metric nearness to bring it closer to its real properties.</span>
+            
+            <span class="n">M_q_inner</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">symmetrize_from_vector</span><span class="p">(</span><span class="n">M_q_inner_lower</span><span class="p">,</span><span class="n">M_0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">M_q_inner</span> <span class="o">=</span> <span class="n">project_metric</span><span class="p">(</span><span class="n">M_q_inner</span><span class="p">,</span><span class="n">f</span><span class="p">)</span> 
+            
+
+            <span class="n">q</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">t</span> <span class="o">+=</span><span class="mi">1</span>
+            <span class="c1">#inner_progress_bar.update(1) </span>
+            <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>   
+                <span class="n">qbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Early Stopping</span>
+            <span class="c1"># Stop the inner loop if between 8 steps it didn&#39;t progress more than 0.75%</span>
+            <span class="c1"># Why do I have the peaks?             </span>
+            <span class="k">if</span> <span class="n">early_stopping</span> <span class="ow">and</span> <span class="n">q</span> <span class="o">&gt;</span> <span class="n">q_min</span><span class="p">:</span>
+                <span class="n">previous_thres</span> <span class="o">=</span> <span class="n">objective_tracker</span><span class="p">[</span><span class="o">-</span><span class="n">interval</span><span class="p">]</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="n">z_in</span> <span class="o">-</span> <span class="n">previous_thres</span><span class="p">)</span><span class="o">/</span><span class="n">previous_thres</span> <span class="o">*</span> <span class="mi">100</span>
+                <span class="n">interval_tracker</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.75</span><span class="p">:</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+        <span class="n">M_p_outer</span> <span class="o">=</span> <span class="n">M_q_inner</span>
+        <span class="n">p</span> <span class="o">+=</span><span class="mi">1</span>
+        <span class="c1">#outer_progress_bar.update(1)</span>
+        <span class="k">if</span> <span class="n">progress_bar</span><span class="p">:</span>
+           <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">M_p_outer</span><span class="p">,</span> <span class="n">objective_tracker</span><span class="p">,</span> <span class="n">product_tracker</span><span class="p">,</span> <span class="n">interval_tracker</span></div>
+
+
+
+
+
+
+<span class="c1">#####------------------ Neighbours --------------------#######</span>
+
+<div class="viewcode-block" id="similar_neighbours"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.similar_neighbours">[docs]</a><span class="k">def</span> <span class="nf">similar_neighbours</span><span class="p">(</span><span class="n">neigh</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">G_all</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Find similar neighbours based on Wasserstein distances and a similarity matrix</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        neigh ([type]): Number of similar neighbours to look at </span>
+<span class="sd">        w ([type]): Similarity matrix</span>
+<span class="sd">        G_all ([type]): Wasserstein distances between each pair of histograms </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">       list(dict(i,w,g)) A list of all histograms with their associated information on k similar neighbours (dictionary of (w,G) pair)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Use w and G to find the right similar(plus) neighbours</span>
+    <span class="c1"># Sort and return index, this way you can access the right stuff </span>
+    <span class="n">n</span>  <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">S_plus</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Loop over all histograms - one row has all neighbours of that row. </span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span> 
+        <span class="c1"># Sort W distances for ith row (or histogram) in ascending order and retrieve indices</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">G_all</span><span class="p">[</span><span class="n">i</span><span class="p">,:],</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;mergesort&#39;</span><span class="p">)</span>
+        <span class="n">n_plus</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># Always start at 1 since first position will be j==i. Distance to itself doesn&#39;t count</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">n_plus</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">neigh</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">j</span><span class="o">!=</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">index</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="n">g</span> <span class="o">=</span> <span class="n">G_all</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">index</span><span class="p">]</span> <span class="c1"># G_ij(M)</span>
+                <span class="n">sim</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">index</span><span class="p">]</span> <span class="c1"># w_ij &gt; 0</span>
+                <span class="n">n_plus</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">index</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">g</span><span class="p">,</span><span class="n">sim</span><span class="p">])})</span>
+                <span class="n">j</span><span class="o">+=</span><span class="mi">1</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">j</span><span class="o">+=</span><span class="mi">1</span> 
+        <span class="n">S_plus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_plus</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">S_plus</span>    </div>
+
+<div class="viewcode-block" id="dissimilar_neighbours"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.dissimilar_neighbours">[docs]</a><span class="k">def</span> <span class="nf">dissimilar_neighbours</span><span class="p">(</span><span class="n">neigh</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">G_all</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Find dissimilar neighbours based on Wasserstein distances and a similarity matrix</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        neigh ([type]): Number of similar neighbours to look at </span>
+<span class="sd">        w ([type]): Similarity matrix</span>
+<span class="sd">        G_all ([type]): Wasserstein distances between each pair of histograms </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">       list(dict(i,w,g)) A list of all histograms with it&#39;s associated information on k similar neighbours (dictionary of (w,G) pair)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Use w and G to find the right plus/minus neighbours</span>
+    <span class="c1"># Sort and return index, this way you can access the right stuff </span>
+    <span class="n">n</span>  <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">S_minus</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Loop over all histograms - one row has all neighbours of that row. </span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span> 
+        <span class="c1"># Sort W distances for ith row (or histogram) in ascending order and retrieve indices</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">G_all</span><span class="p">[</span><span class="n">i</span><span class="p">,:],</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;mergesort&#39;</span><span class="p">)</span>
+        <span class="n">n_minus</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span> <span class="c1"># Always start at 1 since first position will be j==i. Distance to itself doesn&#39;t count</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">n_minus</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">neigh</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">j</span><span class="o">!=</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">index</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">G_all</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">index</span><span class="p">]</span> <span class="c1"># G_ij(M)</span>
+                <span class="n">sim</span> <span class="o">=</span> <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">index</span><span class="p">]</span> <span class="c1"># w_ij &lt; 0    </span>
+                <span class="n">n_minus</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">index</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">g</span><span class="p">,</span><span class="n">sim</span><span class="p">])})</span>
+                <span class="n">j</span><span class="o">+=</span><span class="mi">1</span>  
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">j</span><span class="o">+=</span><span class="mi">1</span> 
+        <span class="n">S_minus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n_minus</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">S_minus</span>    </div>
+
+<div class="viewcode-block" id="sum_neighbours"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.sum_neighbours">[docs]</a><span class="k">def</span> <span class="nf">sum_neighbours</span><span class="p">(</span><span class="n">S</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sums up similar neighbours of all elements in the dataset. </span>
+<span class="sd">    This amounts to sum (S^+_{ik}(M)) from Cuturi GML</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        S (list): List of similar/dissimilar neighbours with pairs (w,G)</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        (list): The weighted sum of distances to similar and disimilar neighbours</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># S is a  list of n dictionaries containing pairs of positive neighbours for that histogram. </span>
+    <span class="c1"># To compute the sum: </span>
+    <span class="n">S_sum</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">S</span><span class="p">:</span> 
+        <span class="n">el_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">el</span><span class="p">:</span> 
+            <span class="n">el_sum</span> <span class="o">+=</span> <span class="n">el</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">el</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">S_sum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">el_sum</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">S_sum</span></div>
+
+
+
+
+
+<span class="c1">#####-------------------------- GRADIENTS -------------------------#####</span>
+
+<div class="viewcode-block" id="gradient_neighbours"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.gradient_neighbours">[docs]</a><span class="k">def</span> <span class="nf">gradient_neighbours</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">T_all</span><span class="p">,</span><span class="n">S</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Finds all gradients for the subset of neighbours as a list of OT matrices </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">       w (matrix): Similarity matrix</span>
+<span class="sd">       T_all (tensor): Tensor of al optimal matrices given by all pairs of histograms</span>
+<span class="sd">       S (list): List containing all information similar OR dissimilar neighbours</span>
+<span class="sd">   </span>
+<span class="sd">    Returns:</span>
+<span class="sd">       list: A list of all OT matrices (~gradients of G) for histograms </span>
+<span class="sd">       containing k similar/dissimilar neighbours (dictionary of (w,X) pair)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Use w and G to find the right plus/minus neighbours</span>
+    <span class="c1"># Sort and return index, this way you can access the right stuff </span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">grad_neigh</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">S</span><span class="p">:</span> 
+        <span class="n">neighbours</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">el</span><span class="p">:</span> 
+            <span class="n">w</span> <span class="o">=</span> <span class="n">el</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># Take w from the dictionary of the distances</span>
+            <span class="n">T</span> <span class="o">=</span> <span class="n">T_all</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="c1"># Take T from the computation you have</span>
+            <span class="n">neighbours</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">T</span><span class="p">,</span><span class="n">w</span><span class="p">])})</span>
+        <span class="n">grad_neigh</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neighbours</span><span class="p">)</span>    
+        <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="k">return</span> <span class="n">grad_neigh</span></div>
+
+<div class="viewcode-block" id="sum_gradients"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.sum_gradients">[docs]</a><span class="k">def</span> <span class="nf">sum_gradients</span><span class="p">(</span><span class="n">grad</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sums up neighbours of all gradients in the dataset. </span>
+<span class="sd">    This amounts to \grad(S^+_{ik}(M)) from Cuturi GML section 4.1</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        grad ([type]): List of neighbour gradients, similar/dissimilar</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        float: A list of the weighted sum of wasserstein distance gradients(equivalent to OT matrix) to similar neighbours</span>
+<span class="sd">    for all histograms</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># S_plus is a  list of n dictionaries containing pairs of positive neighbours for that histogram. </span>
+    <span class="c1"># To compute the sum: </span>
+    <span class="n">grad_sum</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">grad</span><span class="p">:</span> 
+        <span class="n">el_sum</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">el</span><span class="p">:</span> 
+            <span class="n">el_sum</span> <span class="o">+=</span> <span class="n">el</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">el</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">grad_sum</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">el_sum</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">grad_sum</span>        </div>
+
+
+
+
+
+<span class="c1">######-------------------- Helper methods ----------------------#######</span>
+<span class="c1">######---------------------------------------------------------------#######</span>
+
+<div class="viewcode-block" id="similarity_matrix"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.similarity_matrix">[docs]</a><span class="k">def</span> <span class="nf">similarity_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds a similarity matrix using X and Y labels as well as k neighbours. Similarity is given by same labels and the similarity value is proportional to size of data n and neighbours k.</span>
+<span class="sd">    The opposite is true for dissimilarity, same value with a minus sign.</span>
+<span class="sd">        </span>
+<span class="sd">    Args:</span>
+<span class="sd">        X (array(float)): Dataset</span>
+<span class="sd">        Y (array(float)): Labels</span>
+<span class="sd">        k (int): Number of neighbours used in GML</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array[float,float]: A matrix w of shape X.shape[0],X.shape[0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">Y</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span><span class="n">i</span> <span class="o">!=</span> <span class="n">j</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">Y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">Y</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">w</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">w</span></div>
+
+<div class="viewcode-block" id="compute_distances"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.compute_distances">[docs]</a><span class="k">def</span> <span class="nf">compute_distances</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span><span class="n">showProgress</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    
+    <span class="sd">&quot;&quot;&quot;Computes all Wasserstein distances as well as optimal couplings. </span>
+<span class="sd">    Very costly operation</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        X (array(float)): Dataset</span>
+<span class="sd">        M (array(float)): Ground Metric</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list(array,array): All possible W2 distances and couplings for X and M</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">G_all</span> <span class="o">=</span> <span class="n">wasserstein</span><span class="o">.</span><span class="n">all_distances</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span><span class="n">showProgress</span><span class="o">=</span><span class="n">showProgress</span><span class="p">)</span>
+    <span class="n">T_all</span> <span class="o">=</span> <span class="n">wasserstein</span><span class="o">.</span><span class="n">all_couplings</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">,</span><span class="n">showProgress</span><span class="o">=</span><span class="n">showProgress</span><span class="p">)</span>
+
+    <span class="c1">#print(&quot;All done with the heavy load&quot;)</span>
+    <span class="k">return</span> <span class="n">G_all</span><span class="p">,</span> <span class="n">T_all</span></div>
+
+
+
+<span class="c1">### -------- Metric nearness projection ------- #### </span>
+<div class="viewcode-block" id="project_metric"><a class="viewcode-back" href="../../mml/mml.html#mml.gml.project_metric">[docs]</a><span class="k">def</span> <span class="nf">project_metric</span><span class="p">(</span><span class="n">m_initial</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>    
+    <span class="sd">&quot;&quot;&quot;Projects matrices that are not semi-metric to the closest true semi-metric using the metricNearnes software</span>
+<span class="sd">    TODO: Add in the C++ code the possibility to pass some sort of byte array to the metric code, currently reading and </span>
+<span class="sd">    writing to a txt file &quot;metricNearness_process/matrix&quot;</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        m_initial (array): Approximate metric to project</span>
+<span class="sd">        filepath (string): Filename to read and write the matrix </span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        array: Projection of m_initial using the metricNearness software</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span><span class="s2">&quot;metricNearness_process&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    
+    <span class="n">first_line</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">m_initial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span><span class="s2">&quot; &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">m_initial</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">first_line</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">m_initial</span><span class="p">))</span>
+    
+    <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="s1">&#39;./metric -a 0 -f &#39;</span><span class="o">+</span><span class="n">f</span><span class="o">+</span> <span class="s1">&#39; -m 10&#39;</span><span class="p">,</span> <span class="n">shell</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">n&#39;</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1"># Although its square matrix assume it&#39;s not</span>
+    <span class="n">matrix</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">6</span><span class="o">+</span><span class="n">rows</span><span class="p">]</span>
+    <span class="n">m</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">rows</span><span class="p">,</span><span class="n">cols</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span> 
+        <span class="n">vals</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">m</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+     
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">first_line</span><span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">m</span><span class="p">))</span>
+        <span class="c1">#fmt=&quot;%.3f&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span><span class="o">.</span><span class="n">parent</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>   
+    <span class="k">return</span> <span class="n">m</span>    </div>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Patric Fulop.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'58876c6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

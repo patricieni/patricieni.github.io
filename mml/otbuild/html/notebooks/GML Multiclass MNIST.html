@@ -1,0 +1,963 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Multiclass Ground Metric Learning on MNIST &mdash; Metric Learning version 58876c6</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="Metric Learning version 58876c6" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index_ot.html" class="icon icon-home"> Metric Learning
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Notebooks</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning-GPU.html">Multiscale Metric Learning - GPU</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../Multiscale Metric Learning.html">Multiscale Metric Learning</a></li>
+</ul>
+<p class="caption"><span class="caption-text">MML Library</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../mml/mml.html">mml package</a></li>
+</ul>
+<p class="caption"><span class="caption-text">TODO List</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../doc/TODO.html">TODO List</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index_ot.html">Metric Learning</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index_ot.html">Docs</a> &raquo;</li>
+        
+      <li>Multiclass Ground Metric Learning on MNIST</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/notebooks/GML Multiclass MNIST.ipynb" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #303F9F;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #D84315;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 8ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+/* nice headers on first paragraph of info/warning boxes */
+.admonition .first {
+    margin: -12px;
+    padding: 6px 12px;
+    margin-bottom: 12px;
+    color: #fff;
+    line-height: 1;
+    display: block;
+}
+.admonition.warning .first {
+    background: #f0b37e;
+}
+.admonition.note .first {
+    background: #6ab0de;
+}
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+</style>
+<div class="section" id="Multiclass-Ground-Metric-Learning-on-MNIST">
+<h1>Multiclass Ground Metric Learning on MNIST<a class="headerlink" href="#Multiclass-Ground-Metric-Learning-on-MNIST" title="Permalink to this headline">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">division</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+<span class="c1"># Your code goes here</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="k">import</span> <span class="n">testing</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pylab</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">adjusted_rand_score</span><span class="p">,</span> <span class="n">confusion_matrix</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="k">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">Normalizer</span>
+
+<span class="kn">import</span> <span class="nn">metric_learn</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">classification_report</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">NearestNeighbors</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="k">import</span> <span class="n">DistanceMetric</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors.ball_tree</span> <span class="k">import</span> <span class="n">BallTree</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="k">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="k">import</span> <span class="n">log_loss</span>
+
+<span class="c1"># Shogun - Metric Learning</span>
+<span class="kn">from</span> <span class="nn">shogun</span> <span class="k">import</span> <span class="n">LMNN</span> <span class="k">as</span> <span class="n">shogun_LMNN</span>
+<span class="kn">from</span> <span class="nn">shogun</span> <span class="k">import</span> <span class="n">RealFeatures</span><span class="p">,</span> <span class="n">MulticlassLabels</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils.validation</span> <span class="k">import</span> <span class="n">check_X_y</span><span class="p">,</span> <span class="n">check_array</span>
+
+<span class="c1"># POT imports</span>
+<span class="kn">import</span> <span class="nn">ot</span>
+<span class="kn">from</span> <span class="nn">ot.datasets</span> <span class="k">import</span> <span class="n">get_1D_gauss</span> <span class="k">as</span> <span class="n">gauss</span>
+
+<span class="c1"># MML import</span>
+<span class="kn">from</span> <span class="nn">mml</span> <span class="k">import</span> <span class="n">wasserstein</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">gml</span><span class="p">,</span> <span class="n">ot_testing</span><span class="p">,</span> <span class="n">datasets</span>
+<span class="n">data_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;/data/&quot;</span>
+<span class="n">results_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()))</span> <span class="o">+</span> <span class="s2">&quot;/results/multiclass&quot;</span>
+
+<span class="k">def</span> <span class="nf">write_to_pickle</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="n">dataframe</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">data_path</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.pickle&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">read_from_pickle</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="n">data_path</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.pickle&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">importlib</span>
+<span class="n">importlib</span><span class="o">.</span><span class="n">reload</span><span class="p">(</span><span class="n">wasserstein</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[2]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>&lt;module &#39;mml.wasserstein&#39; from &#39;/Users/patricfulop/Documents/Code/Optimal/mml/wasserstein.py&#39;&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="Usage">
+<h2>Usage<a class="headerlink" href="#Usage" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>mml.gml - Wasserstein distances</li>
+<li>mml.gml - OT matrices</li>
+<li>mml.gml - Similarity matrix</li>
+</ul>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">X</span><span class="p">,</span><span class="n">Y</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">load_mnist</span><span class="p">(</span><span class="s2">&quot;Hellinger&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Hellinger representation is sqrt of the data, try with normal representation too.</span>
+<span class="n">train_size</span><span class="o">=</span><span class="mf">0.8</span>
+<span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span>
+<span class="n">X_train</span><span class="p">,</span><span class="n">X_test</span><span class="p">,</span><span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">train_size</span><span class="o">=</span><span class="n">train_size</span><span class="p">,</span><span class="n">test_size</span><span class="o">=</span><span class="n">test_size</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+<span class="n">x1</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">d</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="c1"># By default metric =&#39;sqeuclidean&#39; in the function</span>
+<span class="n">M_original</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">)</span>
+<span class="n">M_original_eye</span> <span class="o">=</span> <span class="n">ot</span><span class="o">.</span><span class="n">dist</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span><span class="n">x1</span><span class="p">,</span><span class="n">metric</span><span class="o">=</span><span class="s1">&#39;hamming&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Make-the-dataset-a-bit-smaller">
+<h3>Make the dataset a bit smaller<a class="headerlink" href="#Make-the-dataset-a-bit-smaller" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">X_train_small</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">180</span><span class="p">]</span>
+<span class="n">X_test_small</span> <span class="o">=</span> <span class="n">X_test</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">80</span><span class="p">]</span>
+<span class="n">Y_train_small</span> <span class="o">=</span> <span class="n">Y_train</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">180</span><span class="p">]</span>
+<span class="n">Y_test_small</span> <span class="o">=</span> <span class="n">Y_test</span><span class="p">[</span><span class="mi">60</span><span class="p">:</span><span class="mi">80</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="GML-M^*-and-W_d-via-Cuturi">
+<h2>GML <span class="math notranslate nohighlight">\(M^*\)</span> and <span class="math notranslate nohighlight">\(W_d\)</span> via Cuturi<a class="headerlink" href="#GML-M^*-and-W_d-via-Cuturi" title="Permalink to this headline">¶</a></h2>
+<p>Questions to answer - are digits normalized? no, we need to perform
+that. does POT do the normalization step itself? NO, we need to do it
+ourselves - We need to build <span class="math notranslate nohighlight">\(M_1\)</span>, the initial distance between
+digits for our algorithm. Follow the algo for doing this. - Try
+Wasserstein with Euclidean distance so that you have an idea of the
+accuracy. Errors are important too though. - Randomize the whole
+training so you can get some error bars. Step 1: Find
+<span class="math notranslate nohighlight">\(D(digit1,digit2)\)</span> as Euclidean and an input to the Wasserstein
+algorithm. Step 2: Have a way of computing <span class="math notranslate nohighlight">\(X^*\)</span> for two digits.
+This is the OT distance. (have another one using Sinkhorn) Step 3: 1)M
+and 2)X will be 64x64 matrices with each entry comparing points in
+1)data space 2) probability space</p>
+<p>Learning ground metrics. - Where does the similarity matrix come from?
+i.e.&nbsp;for us it’s multiclass. Build <span class="math notranslate nohighlight">\(w_ij\)</span> for similar histograms
+using 1/nk - For the feasible set of ground metrics, M has to have L1
+norm of 1. - Find <span class="math notranslate nohighlight">\(W(r_i,r_j)\)</span> such that it’s small for similar
+images, and big for dissimilar images. Problem is all dissimilarities
+are on the same page - which is not entirely true. Can we do better if
+we engineer that? - Remember, Wasserstein-2 is
+<span class="math notranslate nohighlight">\(G_i,j(M) = &lt;X^*,M&gt;\)</span> and gradient of that is <span class="math notranslate nohighlight">\(X^*\)</span>. You need
+to use these. - M is only one. that doesn’t sound right… - How do you
+compute the similar/dissimilar neighbours. You need to keep track of
+1437x1437 wasserstein distances. Then you need to find the k closest
+neighbours. Or maybe half of that. Each line has all neighbours of the
+first position in the line. But what about when i=4 and you’re only
+looking at j &gt; 4</p>
+<p><strong>Build similarity matrix:</strong> * k_neigh = 3 * Can you build <span class="math notranslate nohighlight">\(w\)</span>
+differently, i.e.&nbsp;by encoding some prior information that tells you how
+close r_i and r_j are?</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Transform into histogram since LMNN is non-normalized</span>
+<span class="c1"># Wasserstein will not work if next line is not correct.</span>
+<span class="c1"># TODO: Rewrite the normalizer such that it&#39;s failproof against smaller than 1e-8 values</span>
+
+<span class="p">[</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">X_test_normalized</span><span class="p">]</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">X_test</span><span class="p">,</span><span class="s1">&#39;l1&#39;</span><span class="p">)</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="n">X_train_normalized</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">k_neigh</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">similarity_matrix</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span><span class="n">Y_train</span><span class="p">,</span><span class="n">k_neigh</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">X_train_small_normalized</span><span class="p">,</span> <span class="n">X_test_small_normalized</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">X_train_small</span><span class="p">,</span><span class="n">X_test_small</span><span class="p">,</span><span class="s1">&#39;l1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># This is just to show that there are numerical errors when computing the coupling/distances.</span>
+<span class="c1"># In the algorithms, I just say entry at i,j equals j,i, so T1 == T2</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">X_train_normalized</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">X_train_normalized</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+
+<span class="n">G1</span> <span class="o">=</span> <span class="n">wasserstein</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">c</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s1">&#39;ground metric&#39;</span><span class="p">:</span> <span class="n">M_original</span><span class="p">})</span>
+<span class="p">[</span><span class="n">T1</span><span class="p">,</span><span class="n">M1</span><span class="p">]</span> <span class="o">=</span> <span class="n">wasserstein</span><span class="o">.</span><span class="n">coupling</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;ground metric&#39;</span><span class="p">:</span> <span class="n">M_original</span><span class="p">})</span>
+
+<span class="p">[</span><span class="n">T2</span><span class="p">,</span><span class="n">M2</span><span class="p">]</span> <span class="o">=</span> <span class="n">wasserstein</span><span class="o">.</span><span class="n">coupling</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">r</span><span class="p">,</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;ground metric&#39;</span><span class="p">:</span> <span class="n">M_original</span><span class="p">})</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Distance is: </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">G1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Distance is: 6.416065032109001
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Check that T1 is correct - why not if so?</span>
+<span class="n">rec_r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">T1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">rec_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">T1</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Check that distance is the same as the Frobenius product</span>
+<span class="n">testing</span><span class="o">.</span><span class="n">assert_allclose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">T1</span> <span class="o">*</span> <span class="n">M1</span><span class="p">),</span><span class="n">G1</span><span class="p">)</span>
+
+<span class="c1"># Should they not be symmetric?</span>
+<span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">T1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">T2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[14]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>90
+</pre></div>
+</div>
+</div>
+<p>** Calculate all <span class="math notranslate nohighlight">\(W_2\)</span> distances for the dataset as well as all
+<span class="math notranslate nohighlight">\(T\)</span> **</p>
+<p>** TODO: ** 1. Optimize the calculation even further, by using POT
+on matrices directly (arrays of training points) 2. Check how long it
+takes on GPU for the below computations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">G_subset</span> <span class="o">=</span> <span class="n">wasserstein</span><span class="o">.</span><span class="n">all_distances</span><span class="p">(</span><span class="n">X_train_small_normalized</span><span class="p">,</span><span class="n">M_original</span><span class="p">)</span>
+<span class="n">T_subset</span> <span class="o">=</span> <span class="n">wasserstein</span><span class="o">.</span><span class="n">all_couplings</span><span class="p">(</span><span class="n">X_train_small_normalized</span><span class="p">,</span><span class="n">M_original</span><span class="p">)</span>
+
+<span class="c1">#G_all = wasserstein.all_distances(X_train_normalized,M_original)</span>
+<span class="c1">#T_all = wasserstein.all_couplings(X_train_normalized,M_original)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "357a67ec5ada4d55bc23dad2444a1b0c", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "4e914f876a2842898b97ba903ec2256c", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">G_subset</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_GML_Multiclass_MNIST_16_0.png" src="../_images/notebooks_GML_Multiclass_MNIST_16_0.png" />
+</div>
+</div>
+<p><strong>Sanity check for some properties</strong></p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [40]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Equal to T2 since we&#39;ve done lower diagonal computation</span>
+<span class="p">(</span><span class="n">T_all</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="n">T2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Out[40]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>0
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Symmetry Test</span>
+<span class="n">ot_testing</span><span class="o">.</span><span class="n">is_metric</span><span class="p">(</span><span class="n">G_all</span><span class="p">)</span>
+
+<span class="c1"># Triangle inequality</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">G_all</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">G_all</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">G_all</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">3</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<p><strong>Compose subsets of similar and dissimilar neighbours, everything below
+in in the algo1 method</strong></p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Find neighbours</span>
+<span class="n">S_plus</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">similar_neighbours</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">G_all</span><span class="p">)</span>
+<span class="n">S_minus</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">dissimilar_neighbours</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">G_all</span><span class="p">)</span>
+
+<span class="c1"># Sum neighbours</span>
+<span class="n">similar_sum</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">sum_neighbours</span><span class="p">(</span><span class="n">S_plus</span><span class="p">)</span>
+<span class="n">dissimilar_sum</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">sum_neighbours</span><span class="p">(</span><span class="n">S_minus</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">similar_sum</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dissimilar_sum</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># A bit small, but highly relative to what the similarity looks like.</span>
+<span class="c1"># You choose how to build the similarity matrix, but we&#39;re trying to reproduce Cuturi here</span>
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">similar_sum</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dissimilar_sum</span><span class="p">)</span>
+<span class="n">criterion</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Find Gradients</span>
+<span class="n">grad_plus</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">gradient_neighbours</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">T_all</span><span class="p">,</span> <span class="n">S_plus</span><span class="p">)</span>
+<span class="n">grad_minus</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">gradient_neighbours</span><span class="p">(</span><span class="n">w</span><span class="p">,</span><span class="n">T_all</span><span class="p">,</span><span class="n">S_minus</span><span class="p">)</span>
+
+<span class="c1"># Sum Gradients</span>
+<span class="n">grad_sum_plus</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">sum_gradients</span><span class="p">(</span><span class="n">grad_plus</span><span class="p">)</span>
+<span class="n">grad_sum_minus</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">sum_gradients</span><span class="p">(</span><span class="n">grad_minus</span><span class="p">)</span>
+
+<span class="n">grad_objective_plus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_sum_plus</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">grad_objective_minus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_sum_minus</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">grad_objective_plus</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># We&#39;re already doing that a few rows up</span>
+<span class="c1"># G_all, T_all = gml.compute_distances(X_train_normalized, M_original)</span>
+
+<span class="c1">#z_plus, gamma_plus = gml_similar_algorithm1(M_original, X_train_normalized, w, G_all, T_all, k_neigh)</span>
+<span class="c1">#z_minus, gamma_minus = gml_dissimilar_algorithm1(M_original, X_train_normalized, w, G_all, T_all, k_neigh)</span>
+<span class="c1"># Gradient</span>
+<span class="c1">#plt.imshow(gamma_plus+gamma_minus)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">M_learned</span> <span class="o">=</span> <span class="n">gml_projected_subgradient</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">M_original_eye</span><span class="p">,</span><span class="n">w</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><strong>Cuturi’s approach</strong> * Similarity matrix same approach as me * q_max
+is set to 80 and the inner loop is run at minimum 24 times * Other
+criteria can be change in objective does not change more than 0.75%
+every 8 steps - where the hell did they get this? * A maximum of 20
+outer loops - so p_max = 20 * What does the t step do? * One run takes
+5-6 minutes, Alg2 will take approx 1000 min, 10 hours…Need to get it
+down from there.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">def</span> <span class="nf">projected_subgradient</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">M_original_eye</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">p_max</span><span class="p">,</span> <span class="n">q_max</span><span class="p">,</span> <span class="n">early_stopping</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">X_train_normalized</span>
+    <span class="c1"># M_0 = total_variation()</span>
+    <span class="n">M_0</span> <span class="o">=</span> <span class="n">M_original_eye</span><span class="o">/</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">M_p_outer</span> <span class="o">=</span> <span class="n">M_0</span>
+
+    <span class="c1">#with tqdm.tqdm(total=p_max) as outer_progress_bar:</span>
+    <span class="c1">#outer_progress_bar.set_description(&quot;Outer Loop Progress&quot;)</span>
+    <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm_notebook</span><span class="p">(</span><span class="n">total</span> <span class="o">=</span> <span class="n">p_max</span><span class="p">)</span>
+    <span class="n">pbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Outer Loop progress&quot;</span><span class="p">)</span>
+    <span class="n">objective_tracker</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">product_tracker</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">interval_tracker</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">change_M</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">z_results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">outer_M</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">q_min</span> <span class="o">=</span> <span class="mi">24</span>
+    <span class="n">interval</span> <span class="o">=</span> <span class="mi">8</span>
+
+    <span class="k">while</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="n">p_max</span><span class="p">:</span>
+        <span class="c1">#print(&quot;Outer Loop: Iteration {0}&quot;.format(p))</span>
+        <span class="n">G</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">compute_distances</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">M_p_outer</span><span class="p">,</span> <span class="n">showProgress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1">#outer_M.append(M_p_outer)</span>
+        <span class="n">z_plus</span><span class="p">,</span> <span class="n">gamma_plus</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">algorithm1_similar</span><span class="p">(</span><span class="n">M_p_outer</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">M_q_inner</span> <span class="o">=</span> <span class="n">M_p_outer</span>
+        <span class="c1">#while (z_threshold &lt; 0.001) - capture the change in the objective</span>
+        <span class="c1">#with tqdm.tqdm(total=q_max) as inner_progress_bar:</span>
+        <span class="c1">#inner_progress_bar.set_description(&quot;Inner Loop Progress&quot;)</span>
+        <span class="n">qbar</span> <span class="o">=</span> <span class="n">tqdm_notebook</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">q_max</span><span class="p">)</span>
+        <span class="n">qbar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Inner Loop progress&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">q</span> <span class="o">&lt;</span> <span class="n">q_max</span><span class="p">:</span>
+            <span class="c1">#print(&quot;Inner Loop: Iteration {0}&quot;.format(q))</span>
+            <span class="n">G</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">compute_distances</span><span class="p">(</span><span class="n">X_train_normalized</span><span class="p">,</span> <span class="n">M_q_inner</span><span class="p">,</span> <span class="n">showProgress</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">z_minus</span><span class="p">,</span> <span class="n">gamma_minus</span> <span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">algorithm1_dissimilar</span><span class="p">(</span><span class="n">M_q_inner</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="c1"># The following line should be a pure number, the criteria/error where optimizing</span>
+            <span class="c1"># Please make sure the res value is correctly computed, as the algo doesn&#39;t say much.</span>
+            <span class="c1"># you should deduce from the paper whether it&#39;s a scalar or not, although it should be.</span>
+            <span class="c1"># Maybe the transpose was his way of saying this is a sum...</span>
+            <span class="c1"># Maybe you don&#39;t actually have to do any transpose for gamma plus ...</span>
+            <span class="n">diff</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">tril_vector</span><span class="p">(</span><span class="n">M_q_inner</span><span class="p">)</span> <span class="o">-</span> <span class="n">helper</span><span class="o">.</span><span class="n">tril_vector</span><span class="p">(</span><span class="n">M_p_outer</span><span class="p">)</span>
+            <span class="c1"># Also need to see how this diff evolves. why does the spike appear!!!!!</span>
+
+            <span class="c1"># Basically it starts with previous value somehow..</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">gamma_plus</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+            <span class="n">product_tracker</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+            <span class="n">z_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_minus</span> <span class="o">+</span> <span class="n">z_plus</span><span class="p">)</span>
+
+            <span class="c1"># This is the final objective list</span>
+            <span class="n">z_threshold</span> <span class="o">=</span> <span class="n">z_minus</span> <span class="o">+</span> <span class="n">z_plus</span> <span class="o">+</span> <span class="n">res</span>
+            <span class="n">objective_tracker</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">z_threshold</span><span class="p">)</span>
+
+            <span class="c1"># Gradient descent</span>
+            <span class="c1">#wasserstein.lower_triangular(M_q_inner)</span>
+            <span class="c1">#gamma.append(gamma_plus+gamma_minus)</span>
+            <span class="n">gamma</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+            <span class="n">M_q_inner_lower</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">tril_vector</span><span class="p">(</span><span class="n">M_q_inner</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">learning_rate</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">q</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">gamma_plus</span> <span class="o">+</span> <span class="n">gamma_minus</span><span class="p">)</span>
+            <span class="n">change_M</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">M_q_inner_lower</span><span class="p">)</span>
+
+            <span class="c1"># UnComment here for full symmetric metric matrix</span>
+            <span class="n">M_q_inner</span> <span class="o">=</span> <span class="n">helper</span><span class="o">.</span><span class="n">symmetrize_from_vector</span><span class="p">(</span><span class="n">M_q_inner_lower</span><span class="p">,</span><span class="n">M_0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="c1"># Below is only lower diagonal, I don&#39;t know in what world this projection would work</span>
+            <span class="c1">#M_q_inner = wasserstein.matrix_from_vector(M_q_inner_lower,M_0.shape[0])</span>
+
+            <span class="c1"># Because the output of this algorithm might not be a metric,</span>
+            <span class="c1"># use metric nearness to bring it closer to its real properties.</span>
+            <span class="n">M_q_inner</span><span class="o">=</span> <span class="n">gml</span><span class="o">.</span><span class="n">project_metric</span><span class="p">(</span><span class="n">M_q_inner</span><span class="p">)</span>
+
+            <span class="n">q</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">t</span> <span class="o">+=</span><span class="mi">1</span>
+            <span class="c1">#inner_progress_bar.update(1)</span>
+            <span class="n">qbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Early Stopping</span>
+            <span class="c1"># Stop the inner loop if between 8 steps it didn&#39;t progress more than 0.75%</span>
+            <span class="k">if</span> <span class="n">early_stopping</span> <span class="ow">and</span> <span class="n">q</span> <span class="o">&gt;</span> <span class="n">q_min</span><span class="p">:</span>
+                <span class="n">previous_thres</span> <span class="o">=</span> <span class="n">objective_tracker</span><span class="p">[</span><span class="o">-</span><span class="n">interval</span><span class="p">]</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="n">z_threshold</span> <span class="o">-</span> <span class="n">previous_thres</span><span class="p">)</span><span class="o">/</span><span class="n">previous_thres</span> <span class="o">*</span> <span class="mi">100</span>
+                <span class="n">interval_tracker</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.75</span><span class="p">:</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;assign M inner to outer&quot;</span><span class="p">)</span>
+        <span class="n">M_p_outer</span> <span class="o">=</span> <span class="n">M_q_inner</span>
+        <span class="n">p</span> <span class="o">+=</span><span class="mi">1</span>
+        <span class="c1">#outer_progress_bar.update(1)</span>
+        <span class="n">pbar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">M_p_outer</span><span class="p">,</span> <span class="n">product_tracker</span><span class="p">,</span> <span class="n">objective_tracker</span><span class="p">,</span> <span class="n">interval_tracker</span><span class="p">,</span> <span class="n">change_M</span><span class="p">,</span> <span class="n">z_results</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">outer_M</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Patric Fulop.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'58876c6',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: ''
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
